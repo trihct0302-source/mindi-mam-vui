@@ -1,0 +1,19 @@
+{
+  "build": "V4",
+  "characters": 48,
+  "backgrounds": 4,
+  "props": 16,
+  "animations": {
+    "idle": 48,
+    "tap": 48,
+    "cheer": 48,
+    "sleepy": 48,
+    "energy": 48
+  },
+  "corrupt_assets": [],
+  "javascript_syntax": "PASS (node --check)",
+  "functional_test": "PASS (Node simulated DOM: startup, daily care, wardrobe, remove accessory, date format)",
+  "browser_mobile_test": "BLOCKED (Chromium navigation restricted by environment)",
+  "visual_art_approval": "NOT PASSED (existing source art defects; no independent rigging)",
+  "github_deployed": false
+}

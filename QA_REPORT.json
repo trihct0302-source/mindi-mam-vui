@@ -1,0 +1,17 @@
+{
+  "characters": 48,
+  "backgrounds": 4,
+  "props": 16,
+  "animation_gifs": {
+    "idle": 48,
+    "tap": 48,
+    "cheer": 48,
+    "sleepy": 48,
+    "energy": 48
+  },
+  "transparent_characters": 48,
+  "transparent_props": 16,
+  "missing_or_invalid_images": [],
+  "js_syntax": "PASS",
+  "browser_smoke": "NOT RUN — headless Chromium timed out"
+}
