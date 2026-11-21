@@ -62,7 +62,7 @@ async function initializeCloud(){
    s.rewards=Array.isArray(s.rewards)?[...new Set(s.rewards.filter(x=>items.includes(x)))]:[];
    if(!items.includes(s.equipped)||!s.rewards.includes(s.equipped))s.equipped=null;
    s.rewardWeeks=Array.isArray(s.rewardWeeks)?s.rewardWeeks.filter(x=>typeof x==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(x)):[];
-   cloudReady=true; cloudError=null; localStorage.setItem(userKey,JSON.stringify(s)); render(); showCloudStatus();
+   cloudReady=true; cloudError=null; localStorage.setItem(userKey,JSON.stringify(s)); $('zodiac').value=s.sign; render(); showCloudStatus();
  }catch(err){cloudError=err?.message||'Lỗi kết nối';showCloudStatus();$('care').disabled=true;$('care').textContent='Chưa kết nối được dữ liệu';console.error('MINDI cloud init failed',err);}
 }
 function img(){return `assets/characters/${s.sign}_lv${level()}.png`}
@@ -86,5 +86,5 @@ signs.forEach(([id,name])=>{let o=document.createElement('option');o.value=id;o.
 $('character').onclick=react;
 $('care').onclick=()=>{if(s.days.includes(vnDate()))return;s.days.push(vnDate());s.days=[...new Set(s.days)];let reward=null;if(weekendReward()&&!s.rewardWeeks.includes(weekKey())){s.rewardWeeks.push(weekKey());let missing=items.filter(i=>!s.rewards.includes(i));if(missing.length){reward=missing[Math.floor(Math.random()*missing.length)];s.rewards.push(reward)}}save();render();play('energy',1300);say('Mình nhận được năng lượng rồi! Cảm ơn bạn ♡');if(reward){let i=items.indexOf(reward);pop(`<h2>🎉 Quà cuối tuần!</h2><img width="130" src="assets/props/${reward}.png"><p>Nhận được: <b>${names[i]}</b></p><button class="action" onclick="equip('${reward}')">Trang bị ngay</button>`)}else pop('<h2>🌱 Mầm vui lên rồi!</h2><p>Cảm ơn bạn đã dành một chút thời gian cho bản thân.</p><p>Hẹn gặp bạn ngày mai nhé ♡</p>')};
 $('wardrobe').onclick=wardrobe;$('collection').onclick=collect;$('info').onclick=()=>pop(`<h2>📅 Tiến trình</h2><p>Đã chăm Mầm: <b>${s.days.length} ngày</b></p><p>Cấp hiện tại: <b>${level()}</b></p><p>Mầm sẽ lớn dần sau 7, 21 và 45 ngày bạn ghé thăm.</p><p>Mỗi ngày mới bắt đầu từ 00:00 (giờ Việt Nam).</p><p class="small">Tiến trình được lưu trên trình duyệt này và chưa tự đồng bộ giữa các thiết bị.</p>`);
-render();initializeCloud();setInterval(render,30000);
+render();$('care').disabled=true;$('care').textContent='Đang kết nối khu vườn của bạn…';initializeCloud();setInterval(render,30000);
 </script></body></html>
