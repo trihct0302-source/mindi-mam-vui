@@ -58,10 +58,10 @@ async function initializeCloud(){
      if(saveError)throw saveError;
    }
    if(!signs.some(x=>x[0]===s.sign))s.sign='aries';
-   s.days=Array.isArray(s.days)?[...new Set(s.days.filter(x=>typeof x==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(x)))]:[];
+   s.days=Array.isArray(s.days)?[...new Set(s.days.filter(x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)))]:[];
    s.rewards=Array.isArray(s.rewards)?[...new Set(s.rewards.filter(x=>items.includes(x)))]:[];
    if(!items.includes(s.equipped)||!s.rewards.includes(s.equipped))s.equipped=null;
-   s.rewardWeeks=Array.isArray(s.rewardWeeks)?s.rewardWeeks.filter(x=>typeof x==='string'&&/^\\d{4}-\\d{2}-\\d{2}$/.test(x)):[];
+   s.rewardWeeks=Array.isArray(s.rewardWeeks)?s.rewardWeeks.filter(x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)):[];
    cloudReady=true; cloudError=null; localStorage.setItem(userKey,JSON.stringify(s)); $('zodiac').value=s.sign; render(); showCloudStatus();
  }catch(err){cloudError=err?.message||'Lỗi kết nối';showCloudStatus();$('care').disabled=true;$('care').textContent='Chưa kết nối được dữ liệu';console.error('MINDI cloud init failed',err);}
 }
