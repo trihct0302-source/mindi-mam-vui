@@ -12,8 +12,11 @@
 2. Authentication → Providers → enable **Anonymous Sign-Ins**.
 3. SQL Editor: run `supabase/schema.sql`.
 4. Project Settings → API: copy Project URL and publishable/anon key.
-5. In the GitHub repository, create `supabase-config.js` from `supabase-config.example.js` and fill in the Project URL and publishable/anon key. These are public client values; never put the service-role key in the website or repository.
-6. Enable GitHub Pages deployment from `main` after review/merge.
+5. In GitHub repository Settings → Secrets and variables → Actions, add:
+   - `SUPABASE_URL`: Supabase Project URL.
+   - `SUPABASE_ANON_KEY`: publishable/anon client key.
+6. The Pages workflow generates `supabase-config.js` at build time from these secrets. Do not commit the generated config or any service-role key.
+7. Enable GitHub Pages deployment from `main` after review/merge.
 
 ## Keep existing progress
 On first successful anonymous sign-in in a browser:
