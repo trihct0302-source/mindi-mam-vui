@@ -28,3 +28,5 @@
 .mindi-modal.is-dismissed{display:none!important}
 .mindi-slot.locked{cursor:not-allowed}
 .mindi-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+.mindi-lock-note{text-align:center;color:#8b6b9e;background:#f1e6f8;border:1px dashed #b99bd4;border-radius:12px;padding:10px;font-size:13px;font-weight:750}
