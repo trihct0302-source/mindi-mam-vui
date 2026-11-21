@@ -18,6 +18,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Create public Supabase client config
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          test -n "$SUPABASE_URL" || (echo "Missing SUPABASE_URL repository secret" && exit 1)
+          test -n "$SUPABASE_ANON_KEY" || (echo "Missing SUPABASE_ANON_KEY repository secret" && exit 1)
+          printf "window.MINDI_SUPABASE_URL='%s';\nwindow.MINDI_SUPABASE_ANON_KEY='%s';\n" "$SUPABASE_URL" "$SUPABASE_ANON_KEY" > supabase-config.js
       - uses: actions/configure-pages@v5
         with:
           enablement: true
