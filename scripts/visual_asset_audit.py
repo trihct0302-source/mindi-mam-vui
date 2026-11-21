@@ -71,7 +71,7 @@ html_files = [ROOT / "ui-test.html", ASSETS / "ui-v1" / "popup-v2-demo.html",
 for html in html_files:
     text = html.read_text(encoding="utf-8")
     for ref in re.findall(r'''(?:src|href)=["']([^"'#]+)["']''', text):
-        if ref.startswith(("http://", "https://", "data:", "mailto:", "javascript:")):
+        if "${" in ref or ref.startswith(("http://", "https://", "data:", "mailto:", "javascript:")):
             continue
         target = (html.parent / ref.split("?")[0]).resolve()
         if not target.exists():
