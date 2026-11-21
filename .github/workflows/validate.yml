@@ -1,0 +1,44 @@
+name: Validate MINDI game source
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Extract and syntax-check inline JavaScript
+        run: |
+          node scripts/extract-inline-js.mjs
+          node --check /tmp/mindi-inline.js
+      - name: Check required Supabase security and leaderboard contracts
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const html = readFileSync('index.html', 'utf8');
+          const sql = readFileSync('supabase/schema.sql', 'utf8');
+          const required = [
+            ['leaderboard UI', html.includes('id="leaderboard"')],
+            ['opt-in UI', html.includes('id="leader-opt"')],
+            ['server-side daily claim', html.includes("rpc('record_daily_care')")],
+            ['leaderboard RPC', html.includes("get_global_leaderboard")],
+            ['unique daily event', sql.includes('primary key (user_id, care_date)')],
+            ['profile RLS', sql.includes('auth.uid() = user_id')],
+            ['opt-in filtering', sql.includes('where p.is_opted_in = true')],
+            ['daily event client grants revoked', sql.includes('revoke all on public.daily_care_events from anon, authenticated, public')]
+          ];
+          for (const [name, ok] of required) {
+            console.log((ok ? 'PASS ' : 'FAIL ') + name);
+            if (!ok) process.exitCode = 1;
+          }
+          NODE
