@@ -44,3 +44,21 @@ The popup demo includes a shared motion layer:
 - `prefers-reduced-motion` fallback disables non-essential animation
 
 Test on a 390px mobile viewport and desktop. Switch all 12 character options and open each of the five popup templates. Confirm that repeated care confirmation is disabled in the demo after the first confirmation (demo-only state; refresh resets it).
+
+## Motion System V3 test
+
+Open `assets/ui-v1/motion-v3-demo.html` while serving the repository root. It exercises the reusable event-driven controller without writing game state.
+
+### Scenarios
+- Chest open and item reveal.
+- Care confirmation reaction.
+- Character tap and idle state.
+- Evolution from selected level to the next available level (1→2→3→4) using the existing per-sign GIF assets.
+- Outfit change and item drag/drop.
+- Swipe gesture feedback.
+- Screen transition and loading show/hide.
+- Switch all 12 signs and all 4 levels.
+- Enable OS reduced-motion preference and confirm effects are suppressed.
+
+### Integration contract
+Gameplay must validate an action first, then call the motion API. The motion module only presents animation and emits `mindi:motion` events; it must never award inventory, advance evolution, persist progress, or write Supabase. Production integration remains a separate approved step.
