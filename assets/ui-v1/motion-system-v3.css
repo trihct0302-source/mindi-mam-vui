@@ -1,0 +1,26 @@
+/* MINDI Motion System V3 – reusable CSS choreography */
+[data-mindi-motion-stage]{position:relative;isolation:isolate;overflow:hidden}
+.mindi-motion-layer{position:absolute;z-index:30;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;display:grid;place-items:center;font-weight:1000;color:#594668;text-shadow:0 2px #fff;font-size:clamp(32px,8vw,68px)}
+.chest-layer{width:130px;height:112px;border:6px solid #594668;border-radius:18px;background:linear-gradient(#f7d78d 0 35%,#b9854f 35%);box-shadow:0 8px 0 #59466855;animation:chest-bounce .38s ease-out both}
+.chest-layer:before{content:"";position:absolute;top:32%;left:-6px;right:-6px;height:15px;background:#f6d77d;border:5px solid #594668}
+.chest-layer:after{content:"";position:absolute;top:20%;left:44%;width:20px;height:27px;background:#ffe6a4;border:4px solid #594668;border-radius:7px}
+.chest-layer.is-open{transform:translate(-50%,-65%) rotate(-7deg);filter:brightness(1.12)}
+.item-reveal{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#fff8d8 0 18%,#f6d98a 19% 40%,#a98acb55 41% 70%,transparent 71%);font-size:72px;animation:item-reveal .9s cubic-bezier(.2,.8,.2,1) both}
+.care-burst,.outfit-sparkle{color:#8d70b0;animation:burst .8s ease-out both}
+.evolution-flash{width:100%;height:100%;background:radial-gradient(circle,#fff 0,#f5d98eaa 18%,#a98acb66 45%,transparent 70%);animation:evolution-flash .65s ease-out both}
+.evolution-label{top:25%;padding:9px 20px;background:#8064a8;color:#fff;border:4px solid #594668;border-radius:15px;font-size:18px;box-shadow:0 5px #59466855;animation:label-pop .55s ease-out both}
+.gesture-feedback{font-size:50px;color:#8064a8;animation:gesture .42s ease-out both}
+.loading-layer{inset:0;transform:none;background:#f8f1fcdd;border-radius:inherit;font-size:18px;gap:14px}
+.loading-layer:before{content:"";width:34px;height:34px;border:5px solid #d8c7e8;border-top-color:#8064a8;border-radius:50%;animation:spin .75s linear infinite}
+.outfit-pop{animation:outfit-pop .5s ease-out both}
+.screen-exit{animation:screen-out .2s ease-in both}.screen-enter{animation:screen-in .32s ease-out both}
+.mindi-motion-playing{will-change:transform,filter}
+@keyframes chest-bounce{0%{transform:translate(-50%,-25%) scale(.5);opacity:0}65%{transform:translate(-50%,-55%) scale(1.08);opacity:1}100%{transform:translate(-50%,-50%) scale(1)}}
+@keyframes item-reveal{0%{opacity:0;transform:translate(-50%,20%) scale(.25) rotate(-35deg)}65%{opacity:1;transform:translate(-50%,-60%) scale(1.18) rotate(8deg)}100%{transform:translate(-50%,-50%) scale(1) rotate(0)}}
+@keyframes burst{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}55%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.9)}}
+@keyframes evolution-flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+@keyframes label-pop{0%{opacity:0;transform:translate(-50%,-20%) scale(.5)}75%{opacity:1;transform:translate(-50%,-55%) scale(1.12)}100%{transform:translate(-50%,-50%) scale(1)}}
+@keyframes gesture{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}60%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes outfit-pop{0%{transform:scale(.8) rotate(-8deg);opacity:.6}70%{transform:scale(1.12) rotate(4deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes screen-out{to{opacity:0;transform:translateX(-14px)}}@keyframes screen-in{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.mindi-motion-layer,.outfit-pop,.screen-exit,.screen-enter,.mindi-motion-playing{animation:none!important;transition:none!important}.chest-layer{opacity:1}.item-reveal{opacity:1}}
