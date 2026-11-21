@@ -23,3 +23,8 @@
 .mindi-toast.show{animation:mindi-toast-in .2s ease-out both}
 .mindi-modal.is-entering .mindi-ribbon{animation:mindi-popup-in .42s .04s ease-out both}
 @media(prefers-reduced-motion:reduce){.mindi-modal.is-entering,.mindi-modal.is-leaving,.mindi-character img,.mindi-character.is-celebrating img,.mindi-reward-art,.mindi-modal.sparkle-burst .mindi-ribbon:after,.mindi-slot.selected,.mindi-progress span,.mindi-toast.show,.mindi-modal.is-entering .mindi-ribbon{animation:none!important;transition:none!important}}
+
+/* Acceptance fixes: preview close semantics, locked-item affordance */
+.mindi-modal.is-dismissed{display:none!important}
+.mindi-slot.locked{cursor:not-allowed}
+.mindi-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
