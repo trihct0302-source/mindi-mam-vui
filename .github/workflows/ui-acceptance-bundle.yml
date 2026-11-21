@@ -15,7 +15,7 @@ jobs:
           ref: feature/mam-vui-cosy-ui-v1
       - name: Assemble isolated test package
         run: |
-          mkdir -p dist/mindi-ui-acceptance
+          mkdir -p dist/mindi-ui-acceptance/assets
           cp ui-test.html UI_TEST_GUIDE.md dist/mindi-ui-acceptance/
           cp -R assets/ui-v1 assets/animations assets/backgrounds assets/characters assets/props dist/mindi-ui-acceptance/assets/
           cat > dist/mindi-ui-acceptance/README-TEST-FIRST.md <<'EOF'
