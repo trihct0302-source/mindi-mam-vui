@@ -34,7 +34,7 @@ export class MindiMotion{
     }
     if(name==='character.evolve'){
       const from=clampLevel(ctx.fromLevel||1),to=clampLevel(ctx.toLevel||from+1);
-      if(to<=from){this.emit('blocked',{reason:'target-level-must-be-higher',context:ctx});finish();return}
+      if(to<=from){this.emit('blocked',{reason:'target-level-must-be-higher',context:ctx});this.active=null;return}
       setCharacter('energy',1500);this.layer('✦','evolution-flash');
       await this.wait(650);if(this.active!==token)return;
       if(this.characterEl)this.characterEl.src=this.asset('cheer',{...ctx,level:to});
