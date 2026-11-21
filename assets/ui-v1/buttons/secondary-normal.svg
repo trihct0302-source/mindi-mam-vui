@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="60" viewBox="0 0 220 60" shape-rendering="crispEdges">
+<path d="M12 2H208L218 12V48L208 58H12L2 48V12Z" fill="#8064A8"/>
+<path d="M14 5H206L214 13V46L206 54H14L6 46V13Z" fill="#F4EAF8"/>
+<path d="M16 7H204L208 11H12Z" fill="#FFFFFF"/>
+<path d="M16 50H204L200 53H20Z" fill="#8064A8" opacity=".65"/>
+</svg>
