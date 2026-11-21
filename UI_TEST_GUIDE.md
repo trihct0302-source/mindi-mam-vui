@@ -23,3 +23,10 @@ This is an isolated test build based on the current `main/index.html` gameplay l
 - The game currently stores progress in localStorage in this browser; this test does not validate Supabase or cross-user isolation.
 - SVG assets are transparent by construction. Verify on both light and dark backgrounds; do not convert to JPEG.
 - Do not merge the UI skin into production until visual and interaction QA is approved.
+
+
+## Panel & Popup V2
+
+Open `assets/ui-v1/popup-v2-demo.html` while serving the repository root. This is an interactive component gallery with five templates: reward, care confirmation, wardrobe, collection, and character notice. Change the character selector to inspect the shared layout with all 12 character portraits.
+
+The demo is sample-only. Buttons and filters demonstrate visual states and do not write game progress, inventory, or Supabase records.
