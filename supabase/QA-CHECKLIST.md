@@ -33,3 +33,16 @@
 - [ ] Mobile and desktop visual checks pass.
 
 Do not mark this release fully accepted until backend setup and two-user isolation tests have passed.
+
+
+## Global leaderboard
+- [ ] User A leaves opt-in disabled: A must not appear in public leaderboard results.
+- [ ] User A opts in with a pseudonym: only that display name and weekly point total appear.
+- [ ] User A opts out: A disappears from leaderboard results.
+- [ ] User B cannot read A's private leaderboard profile row directly.
+- [ ] No email, Auth UUID, zodiac, inventory, plant JSON, or exact timestamps are exposed by leaderboard RPC.
+- [ ] Call `record_daily_care()` twice on the same Vietnam date: first accepted=true, second accepted=false, weekly score remains 1.
+- [ ] Two different anonymous users can each earn one point on the same date.
+- [ ] Weekly score rolls over at Monday 00:00 Asia/Ho_Chi_Minh.
+- [ ] Direct INSERT/UPDATE/DELETE on `daily_care_events` is denied to authenticated clients.
+- [ ] `supabase/tests/leaderboard.sql` passes with two real Auth UUIDs.
