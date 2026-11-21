@@ -6,8 +6,8 @@ const signs={aries:'Bạch Dương',taurus:'Kim Ngưu',gemini:'Song Tử',cancer
 const views=['reward','care','wardrobe','collection','notice'];let view='reward',selected='flower',filter='all';
 const items=[['flower','Hoa','🌼','Hiếm',true],['book','Sách','📖','Thường',true],['teddy','Gấu bông','🧸','Hiếm',true],['star_lamp','Đèn sao','🌟','Quý',false],['camera','Máy ảnh','📷','Thường',true],['coffee','Cà phê','☕','Thường',false],['bow','Nơ','🎀','Hiếm',true],['headphones','Tai nghe','🎧','Quý',false]];
 const $=id=>document.getElementById(id), sign=()=> $('character').value;
-function portrait(){return 'assets/characters/'+sign()+'_lv2.png'}
-function art(id){const map={flower:'flower',book:'book',teddy:'teddy',star_lamp:'star_lamp',camera:'camera',coffee:'coffee',bow:'bow',headphones:'headphones'};return 'assets/props/'+(map[id]||'flower')+'.png'}
+function portrait(){return '../../assets/characters/'+sign()+'_lv2.png'}
+function art(id){const map={flower:'flower',book:'book',teddy:'teddy',star_lamp:'star_lamp',camera:'camera',coffee:'coffee',bow:'bow',headphones:'headphones'};return '../../assets/props/'+(map[id]||'flower')+'.png'}
 function slot(item){return '<button class="mindi-slot '+(!item[4]?'locked ':'')+(selected===item[0]?'selected':'')+'" data-item="'+item[0]+'"><img src="'+art(item[0])+'" alt=""><strong>'+item[1]+'</strong><small>'+(!item[4]?'🔒 Chưa mở':item[3])+'</small>'+(item[4]?'<span class="tag">Đã có</span>':'')+'</button>'}
 function render(){document.querySelectorAll('.mindi-tab').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.view===view)));let c='';
 if(view==='reward')c='<div class="mindi-ribbon">🎉 Quà dành cho bạn</div><div class="mindi-copy"><span class="mindi-rarity">HIẾM · QUÀ CUỐI TUẦN</span><img class="mindi-reward-art" src="'+art('flower')+'" alt="Hoa"><h2>Hoa nắng nhỏ</h2><p>Một món quà xinh xắn để Mầm mang theo trong hành trình lớn lên.</p><p class="mindi-muted">Vật phẩm mới đã được thêm vào bộ sưu tập.</p></div><div class="mindi-actions"><button class="mindi-btn secondary" data-action="later">Để sau</button><button class="mindi-btn gold" data-action="equip">🎀 Trang bị ngay</button></div>';
