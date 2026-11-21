@@ -17,7 +17,7 @@ document.querySelectorAll('[data-event]').forEach(b=>b.onclick=()=>{const name=b
 $('playIdle').onclick=()=>motion.play('character.idle',ctx());
 $('hideLoading').onclick=()=>motion.play('loading.hide',ctx());
 $('reset').onclick=()=>{motion.clear();refresh();$('status').textContent='Đã reset preview.'};
-document.addEventListener('mindi:motion',e=>{if(e.detail.name==='drop'){$('outfit').src='../../assets/props/'+e.detail.itemId+'.png';motion.play('outfit.change',ctx())}});
+document.addEventListener('mindi:motion',e=>{if(e.detail.name==='drop'){$('outfit').src='../../assets/props/'+e.detail.itemId+'.png';setTimeout(()=>motion.play('outfit.change',ctx()),460)}});
 window.addEventListener('beforeunload',()=>motion.destroy());
 refresh();
 </script></body></html>
