@@ -25,7 +25,7 @@ const signs=[['aries','Bạch Dương'],['taurus','Kim Ngưu'],['gemini','Song T
 const items=['bubble_tea','teddy','snack','mirror','lipstick','headphones','bow','beanie','book','coffee','hotpot','camera','flower','sunglasses','scarf','star_lamp'];
 const names=['Trà sữa','Gấu bông','Snack','Gương','Son','Tai nghe','Nơ','Mũ len','Sách','Cà phê','Lẩu','Máy ảnh','Hoa','Kính','Khăn','Đèn sao'];
 const sayings={morning:['Dậy thôi! Hôm nay mình làm một việc nhỏ trước nha!','Hôm nay không cần hoàn hảo, chỉ cần bắt đầu.'],noon:['Ăn trưa chưa? Nhớ nạp năng lượng đó!','Uống nước rồi mình tiếp tục nha.'],afternoon:['Bạn đã cố gắng nhiều rồi. Nghỉ mắt một chút nhé!','Còn chút nữa thôi, mình cổ vũ nè!'],night:['Hôm nay đủ rồi, nghỉ ngơi thôi!','Mình trông góc bàn, bạn đi ngủ nha.']};
-const key='mindi-mamvui-v1';
+const key='mindi-mamvui-ui-test-v1';
 let s;try{s=JSON.parse(localStorage.getItem(key)||'null')}catch(e){s=null}
 if(!s||typeof s!=='object')s={};
 if(!signs.some(x=>x[0]===s.sign))s.sign='aries';
