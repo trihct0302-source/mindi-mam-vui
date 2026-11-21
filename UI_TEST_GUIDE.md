@@ -30,3 +30,17 @@ This is an isolated test build based on the current `main/index.html` gameplay l
 Open `assets/ui-v1/popup-v2-demo.html` while serving the repository root. This is an interactive component gallery with five templates: reward, care confirmation, wardrobe, collection, and character notice. Change the character selector to inspect the shared layout with all 12 character portraits.
 
 The demo is sample-only. Buttons and filters demonstrate visual states and do not write game progress, inventory, or Supabase records.
+
+
+## Motion V2 test
+
+The popup demo includes a shared motion layer:
+- Modal enter / close transition
+- Reward item reveal
+- Character idle bob and care-confirm celebration
+- Sparkle accent on reward/equip/care confirmation
+- Item selected micro-interaction
+- Progress fill and toast entrance
+- `prefers-reduced-motion` fallback disables non-essential animation
+
+Test on a 390px mobile viewport and desktop. Switch all 12 character options and open each of the five popup templates. Confirm that repeated care confirmation is disabled in the demo after the first confirmation (demo-only state; refresh resets it).
