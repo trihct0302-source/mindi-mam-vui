@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/mam-vui-cosy-ui-v1
+      - qa/v1.4-visual-clipping
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,7 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature/mam-vui-cosy-ui-v1
+          ref: ${{ github.ref }}
+      - name: Install image audit dependency
+        run: python -m pip install Pillow
+      - name: Run V1.4 visual asset audit
+        run: python scripts/visual_asset_audit.py
       - name: Assemble isolated test package
         run: |
           mkdir -p dist/mindi-ui-acceptance/assets
@@ -49,9 +54,10 @@ jobs:
           These are visual/interaction demos only. They do not connect to Supabase or change production index.html/game state. No production merge is included.
           EOF
           cd dist
-          zip -qr mindi-ui-acceptance-v1.zip mindi-ui-acceptance
+          cp ../../QA/V1.4-VISUAL-ACCEPTANCE.md dist/mindi-ui-acceptance/V1.4-VISUAL-ACCEPTANCE.md
+          zip -qr mindi-ui-acceptance-v1.4.zip mindi-ui-acceptance
       - uses: actions/upload-artifact@v4
         with:
-          name: mindi-ui-acceptance-v1
-          path: dist/mindi-ui-acceptance-v1.zip
+          name: mindi-ui-acceptance-v1.4
+          path: dist/mindi-ui-acceptance-v1.4.zip
           retention-days: 14
