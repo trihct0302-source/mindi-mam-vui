@@ -39,3 +39,13 @@ Run `supabase/tests/rls-isolation.sql` with two distinct Auth user UUIDs, replac
 
 ## Current integration limitation
 The repository cannot connect to a Supabase project until the project URL/key are configured and the SQL migration is applied. Until then, the UI intentionally disables the daily-care action instead of silently writing to a shared/local fallback. Anonymous sessions are per browser profile; clearing site storage can lose the anonymous identity unless the user has an account-linking/recovery flow (not included in this V1).
+
+
+## Global leaderboard
+- Global leaderboard is opt-in. The default is private / not listed.
+- Players choose a pseudonymous display name (2–20 alphanumeric, spaces, underscore, or hyphen).
+- Only display name, rank, and current Vietnam-week point total are returned by the leaderboard RPC.
+- Auth UUID, email, zodiac, plant state, inventory, and exact check-in timestamps are never exposed.
+- A server-side RPC records at most one daily event per authenticated user per Vietnam date using a unique key. Weekly points are derived from those events, not client-submitted values.
+- Scores reset by week (Monday 00:00 Asia/Ho_Chi_Minh).
+- Run `supabase/tests/leaderboard.sql` after replacing UUID placeholders with two real anonymous Auth user IDs.
