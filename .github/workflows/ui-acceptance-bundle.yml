@@ -54,7 +54,7 @@ jobs:
           These are visual/interaction demos only. They do not connect to Supabase or change production index.html/game state. No production merge is included.
           EOF
           cd dist
-          cp ../../QA/V1.4-VISUAL-ACCEPTANCE.md dist/mindi-ui-acceptance/V1.4-VISUAL-ACCEPTANCE.md
+          cp ../QA/V1.4-VISUAL-ACCEPTANCE.md mindi-ui-acceptance/V1.4-VISUAL-ACCEPTANCE.md
           zip -qr mindi-ui-acceptance-v1.4.zip mindi-ui-acceptance
       - uses: actions/upload-artifact@v4
         with:
