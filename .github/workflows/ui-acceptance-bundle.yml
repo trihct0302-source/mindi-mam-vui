@@ -21,8 +21,9 @@ jobs:
       - name: Assemble isolated test package
         run: |
           mkdir -p dist/mindi-ui-acceptance/assets
-          cp ui-test.html UI_TEST_GUIDE.md dist/mindi-ui-acceptance/
+          cp ui-test.html ui-test.css UI_TEST_GUIDE.md dist/mindi-ui-acceptance/
           cp -R assets/ui-v1 assets/animations assets/backgrounds assets/characters assets/props dist/mindi-ui-acceptance/assets/
+          cp -R assets/qa-v151 dist/mindi-ui-acceptance/assets/
           cat > dist/mindi-ui-acceptance/README-TEST-FIRST.md <<'EOF'
           # MINDI Mầm Vui – UI Acceptance Bundle
           Includes two isolated test modules:
@@ -42,7 +43,9 @@ jobs:
           
           ## Acceptance checklist
           - [ ] UI Test V1 speech bubble has bounded width, centered text and no full-width white strip.
-          - [ ] Wardrobe, Collection and Progress dialogs keep the 9-slice frame at the edges; decoration does not cover text.
+          - [ ] The disabled daily care button has aligned fill and border, and remains locked after reload.
+          - [ ] Sunday care awards one item and records one care day in the calendar.
+          - [ ] The Aquarius level 1 sprite displays without a wide matte or detached specks beneath the feet.
           - [ ] Dialog content scrolls on short mobile viewports and text does not overflow.
           - [ ] Popup V2: test all five templates (reward, care confirmation, wardrobe, collection, character notice).
           - [ ] Popup V2: switch through all 12 characters; inspect item locked/owned/equipped states.
@@ -55,9 +58,9 @@ jobs:
           EOF
           cd dist
           cp ../QA/V1.4-VISUAL-ACCEPTANCE.md mindi-ui-acceptance/V1.4-VISUAL-ACCEPTANCE.md
-          zip -qr mindi-ui-acceptance-v1.4.zip mindi-ui-acceptance
+          zip -qr mindi-ui-acceptance-v1.5.1.zip mindi-ui-acceptance
       - uses: actions/upload-artifact@v4
         with:
-          name: mindi-ui-acceptance-v1.4
-          path: dist/mindi-ui-acceptance-v1.4.zip
+          name: mindi-ui-acceptance-v1.5.1
+          path: dist/mindi-ui-acceptance-v1.5.1.zip
           retention-days: 14
