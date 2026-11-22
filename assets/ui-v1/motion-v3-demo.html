@@ -9,16 +9,16 @@
 <script type="module">
 import {MindiMotion} from './motion-system-v3.js';
 const $=id=>document.getElementById(id);const pet=$('pet');
-const motion=new MindiMotion({root:document,characterEl:pet,onEvent:(name,detail)=>{const messages={start:'Đang thực hiện hiệu ứng…',complete:'Hoàn tất hiệu ứng.',blocked:'Mầm đã đạt cấp tối đa.',loading:'Đang tải…',drop:'Đã gắn phụ kiện cho Mầm.',unsupported:'Hiệu ứng này chưa được hỗ trợ.'};$('status').textContent=messages[name]||'Mầm vừa có một tương tác mới.';if(name==='complete'&&detail.name==='character.evolve'){$('level').value=String(detail.context.toLevel);refresh();$('status').textContent='Mầm đã tiến hóa lên cấp '+detail.context.toLevel+'.';}syncEvolution();}});
+const motion=new MindiMotion({root:document,characterEl:pet,onEvent:(name,detail)=>{const messages={start:'Đang thực hiện hiệu ứng…',complete:'Hoàn tất hiệu ứng.',blocked:'Mầm đã đạt cấp tối đa.',loading:'Đang tải…',drop:'Đã gắn phụ kiện cho Mầm.',unsupported:'Hiệu ứng này chưa được hỗ trợ.'};$('status').textContent=messages[name]||'Mầm vừa có một tương tác mới.';if(name==='complete'&&detail.name==='character.evolve'){$('level').value=String(detail.context.toLevel);refresh();$('status').textContent='Mầm đã tiến hóa lên cấp '+detail.context.toLevel+'.';}if(name==='complete'&&detail.name==='gesture.drag-drop')motion.play('outfit.change',ctx());syncEvolution();}});
 function ctx(){return {characterId:$('sign').value,level:Number($('level').value),fromLevel:Number($('level').value),toLevel:Math.min(4,Number($('level').value)+1),itemEmoji:'🌼',outfitEl:$('outfit')}}
-function syncEvolution(){const max=Number($('level').value)>=4;const b=$('evolveBtn');b.disabled=max;b.textContent=max?'✓ Đã đạt cấp tối đa':'⬆️ Tiến hóa';if(max)$('status').textContent='Đã đạt cấp tối đa. Mầm không thể tiến hóa thêm.';}
-function refresh(){const c=ctx();pet.dataset.character=c.characterId;pet.dataset.level=c.level;pet.src='../../assets/animations/idle/'+c.characterId+'_lv'+c.level+'.gif';$('stageTitle').textContent='Mầm '+$('sign').selectedOptions[0].text+' · Cấp '+c.level;syncEvolution()}
+function syncEvolution(){const max=Number($('level').value)>=4;const b=$('evolveBtn');b.disabled=max;b.textContent=max?'✓ Đã đạt cấp tối đa':'⬆️ Tiến hóa';}
+function refresh(){motion.clear();$('status').textContent=Number($('level').value)>=4?'Đã đạt cấp tối đa. Mầm không thể tiến hóa thêm.':'Sẵn sàng thử hiệu ứng.';const c=ctx();pet.dataset.character=c.characterId;pet.dataset.level=c.level;pet.src='../../assets/animations/idle/'+c.characterId+'_lv'+c.level+'.gif';$('stageTitle').textContent='Mầm '+$('sign').selectedOptions[0].text+' · Cấp '+c.level;syncEvolution()}
 $('sign').onchange=refresh;$('level').onchange=refresh;
 document.querySelectorAll('[data-event]').forEach(b=>b.onclick=()=>{const name=b.dataset.event;if(name==='character.evolve'&&Number($('level').value)>=4){syncEvolution();return}motion.play(name,ctx())});
 $('playIdle').onclick=()=>motion.play('character.idle',ctx());
 $('hideLoading').onclick=()=>motion.play('loading.hide',ctx());
 $('reset').onclick=()=>{motion.clear();refresh();$('status').textContent='Đã reset preview.'};
-document.addEventListener('mindi:motion',e=>{if(e.detail.name==='drop'){$('outfit').src='../../assets/props/'+e.detail.itemId+'.png';setTimeout(()=>motion.play('outfit.change',ctx()),460)}});
+document.addEventListener('mindi:motion',e=>{if(e.detail.name==='drop'){$('outfit').src='../../assets/props/'+e.detail.itemId+'.png';}});
 window.addEventListener('beforeunload',()=>motion.destroy());
 refresh();
 </script></body></html>
