@@ -1,0 +1,68 @@
+name: Build MINDI UI acceptance bundle
+on:
+  push:
+    branches:
+      - feature/mam-vui-cosy-ui-v1
+      - qa/v1.4-visual-clipping
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Install image audit dependency
+        run: python -m pip install Pillow
+      - name: Run V1.4 visual asset audit
+        run: python scripts/visual_asset_audit.py
+      - name: Run Motion V3 regression
+        run: node tests/motion-regression.mjs
+      - name: Assemble isolated test package
+        run: |
+          mkdir -p dist/mindi-ui-acceptance/assets
+          cp ui-test.html ui-test.css UI_TEST_GUIDE.md dist/mindi-ui-acceptance/
+          cp -R assets/ui-v1 assets/animations assets/backgrounds assets/characters assets/props dist/mindi-ui-acceptance/assets/
+          cp -R assets/qa-v151 dist/mindi-ui-acceptance/assets/
+          cat > dist/mindi-ui-acceptance/README-TEST-FIRST.md <<'EOF'
+          # MINDI Mầm Vui – UI Acceptance Bundle
+          Includes two isolated test modules:
+          1. Panel & Popup V2: assets/ui-v1/popup-v2-demo.html
+          2. Motion System V3: assets/ui-v1/motion-v3-demo.html
+          Also includes the corrected game UI test page: ui-test.html.
+          
+          ## Run
+          Extract this ZIP. From the extracted folder run:
+          python3 -m http.server 8000
+          Then open:
+          - http://localhost:8000/ui-test.html
+          - http://localhost:8000/assets/ui-v1/popup-v2-demo.html
+          - http://localhost:8000/assets/ui-v1/motion-v3-demo.html
+          
+          Do not open the HTML files using file://; use the local server so relative asset paths and ES modules load.
+          
+          ## Acceptance checklist
+          - [ ] UI Test V1 speech bubble has bounded width, centered text and no full-width white strip.
+          - [ ] The disabled daily care button has aligned fill and border, and remains locked after reload.
+          - [ ] Sunday care awards one item and records one care day in the calendar.
+          - [ ] The Aquarius level 1 sprite displays without a wide matte or detached specks beneath the feet.
+          - [ ] Dialog content scrolls on short mobile viewports and text does not overflow.
+          - [ ] Popup V2: test all five templates (reward, care confirmation, wardrobe, collection, character notice).
+          - [ ] Popup V2: switch through all 12 characters; inspect item locked/owned/equipped states.
+          - [ ] Motion V3: chest open, item reveal, care confirm, tap, evolution, outfit change, swipe, drag/drop, screen transition, loading show/hide.
+          - [ ] Motion V3: test 12 signs × 4 levels; enable OS reduced-motion preference.
+          - [ ] No broken/white-matte image edges on light and dark backgrounds.
+          
+          ## Safety boundary
+          These are visual/interaction demos only. They do not connect to Supabase or change production index.html/game state. No production merge is included.
+          EOF
+          cd dist
+          cp ../QA/V1.4-VISUAL-ACCEPTANCE.md mindi-ui-acceptance/V1.4-VISUAL-ACCEPTANCE.md
+          zip -qr mindi-ui-acceptance-v1.5.1.zip mindi-ui-acceptance
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mindi-ui-acceptance-v1.5.1
+          path: dist/mindi-ui-acceptance-v1.5.1.zip
+          retention-days: 14

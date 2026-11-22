@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MINDI · Mầm Vui Mỗi Ngày</title>
+  <link rel="stylesheet" href="ui-test.css">
+</head>
+<body>
+  <main id="game" aria-label="MINDI Mầm Vui · Bản nghiệm thu">
+    <header id="top">
+      <label class="pill">🌱 MINDI <select id="zodiac" aria-label="Chọn Mầm theo cung"></select></label>
+      <div class="pill" id="level"></div>
+    </header>
+    <p id="bubble" role="status">Một chạm hôm nay, thêm chút năng lượng! ♡</p>
+    <div id="petStage">
+      <button id="petControl" type="button" aria-label="Chạm để Mầm phản ứng">
+        <img id="character" alt="" draggable="false">
+        <img id="equipped" alt="" draggable="false" hidden>
+      </button>
+    </div>
+    <div id="bottom">
+      <button id="care" type="button">🌱 Chăm Mầm hôm nay ♡</button>
+      <section class="calendar" aria-labelledby="calendar-title">
+        <h2 id="calendar-title">Lịch chăm tuần này</h2>
+        <ol class="week" id="week"></ol>
+      </section>
+      <nav class="nav" aria-label="Hoạt động của Mầm">
+        <button id="wardrobe" type="button"><span aria-hidden="true">🎀</span><span>Tủ đồ</span></button>
+        <button id="collection" type="button"><span aria-hidden="true">🎁</span><span>Bộ sưu tập</span></button>
+        <button id="info" type="button"><span aria-hidden="true">📅</span><span>Tiến trình</span></button>
+      </nav>
+    </div>
+  </main>
+  <dialog id="modal" aria-label="Hoạt động của Mầm">
+    <button class="close" type="button" aria-label="Đóng" onclick="this.closest('dialog').close()">✕</button>
+    <div id="modalBody"></div>
+  </dialog>
+<script>
+const signs=[['aries','Bạch Dương'],['taurus','Kim Ngưu'],['gemini','Song Tử'],['cancer','Cự Giải'],['leo','Sư Tử'],['virgo','Xử Nữ'],['libra','Thiên Bình'],['scorpio','Bọ Cạp'],['sagittarius','Nhân Mã'],['capricorn','Ma Kết'],['aquarius','Bảo Bình'],['pisces','Song Ngư']];
+const items=['bubble_tea','teddy','snack','mirror','lipstick','headphones','bow','beanie','book','coffee','hotpot','camera','flower','sunglasses','scarf','star_lamp'];
+const names=['Trà sữa','Gấu bông','Snack','Gương','Son','Tai nghe','Nơ','Mũ len','Sách','Cà phê','Lẩu','Máy ảnh','Hoa','Kính','Khăn','Đèn sao'];
+const sayings={morning:['Dậy thôi! Hôm nay mình làm một việc nhỏ trước nha!','Hôm nay không cần hoàn hảo, chỉ cần bắt đầu.'],noon:['Ăn trưa chưa? Nhớ nạp năng lượng đó!','Uống nước rồi mình tiếp tục nha.'],afternoon:['Bạn đã cố gắng nhiều rồi. Nghỉ mắt một chút nhé!','Còn chút nữa thôi, mình cổ vũ nè!'],night:['Hôm nay đủ rồi, nghỉ ngơi thôi!','Mình trông góc bàn, bạn đi ngủ nha.']};
+const key='mindi-mamvui-ui-test-v1';
+let s;try{s=JSON.parse(localStorage.getItem(key)||'null')}catch(e){s=null}
+if(!s||typeof s!=='object')s={};
+if(!signs.some(x=>x[0]===s.sign))s.sign='aries';
+s.days=Array.isArray(s.days)?[...new Set(s.days.filter(x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)))]:[];
+s.rewards=Array.isArray(s.rewards)?[...new Set(s.rewards.filter(x=>items.includes(x)))]:[];
+if(!items.includes(s.equipped)||!s.rewards.includes(s.equipped))s.equipped=null; const $=id=>document.getElementById(id);
+function vnDate(d=new Date()){let parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);let obj=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));return `${obj.year}-${obj.month}-${obj.day}`}
+function hourVN(){return Number(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',hour:'numeric',hourCycle:'h23'}).format(new Date()))}
+function time(){let h=hourVN();return h>=5&&h<12?'morning':h<14?'noon':h<19?'afternoon':'night'}
+function level(){let n=s.days.length;return n>=45?4:n>=21?3:n>=7?2:1}
+function save(){localStorage.setItem(key,JSON.stringify(s))}
+function animationPath(kind) {
+  const currentLevel = level();
+  const root = s.sign === 'aquarius' && currentLevel === 1 ? 'assets/qa-v151' : 'assets';
+  return `${root}/animations/${kind}/${s.sign}_lv${currentLevel}.gif`;
+}
+let animationTimer=null;
+function play(kind,duration=1000){clearTimeout(animationTimer);$('character').src=animationPath(kind);animationTimer=setTimeout(()=>{animationTimer=null;$('character').src=animationPath(time()==='night'?'sleepy':'idle')},duration)}
+function updateEquipped(){let el=$('equipped');el.hidden=!s.equipped;if(s.equipped)el.src=`assets/props/${s.equipped}.png`}
+
+function say(txt){$('bubble').textContent=txt}
+function react(){const a=sayings[time()];say(a[Math.floor(Math.random()*a.length)]);play('tap',900)}
+function render(){let t=time();$('game').style.backgroundImage=`url(assets/backgrounds/${t}.png)`;if(!animationTimer){let url=animationPath(t==='night'?'sleepy':'idle');if(!$('character').src.endsWith(url))$('character').src=url;}updateEquipped();$('level').textContent=`${['Mầm mới','Mầm quen','Mầm lớn','Mầm trưởng thành'][level()-1]} · ${s.days.length} ngày bên nhau`;$('care').disabled=s.days.includes(vnDate());$('care').textContent=$('care').disabled?'✓ Đã chăm hôm nay · Hẹn mai nhé':'🌱 Chăm Mầm hôm nay ♡';
+  renderWeek();
+}
+function renderWeek() {
+  const today = vnDate();
+  const monday = new Date(weekKey() + 'T12:00:00Z');
+  const labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+  $('week').innerHTML = labels.map((label, index) => {
+    const date = new Date(monday);
+    date.setUTCDate(monday.getUTCDate() + index);
+    const iso = date.toISOString().slice(0, 10);
+    const done = s.days.includes(iso);
+    const rewardDay = index === 6;
+    const status = done ? 'Đã chăm' : rewardDay ? 'Chưa chăm, ngày quà' : 'Chưa chăm';
+    const marker = done ? '✓' : rewardDay ? '🎁' : '·';
+    return `<li class="day${done ? ' done' : ''}"${iso === today ? ' aria-current="date"' : ''}>
+      <time datetime="${iso}">${label}</time>
+      <span class="day-marker" aria-hidden="true">${marker}</span>
+      <span class="visually-hidden">${status}</span>
+    </li>`;
+  }).join('');
+}
+function pop(content){$('modalBody').innerHTML=content;if(!$('modal').open)$('modal').showModal()}
+function weekKey(){let dt=new Date(vnDate()+'T12:00:00Z');let n=(dt.getUTCDay()+6)%7;dt.setUTCDate(dt.getUTCDate()-n);return dt.toISOString().slice(0,10)}
+s.rewardWeeks=Array.isArray(s.rewardWeeks)?s.rewardWeeks.filter(x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)):[];
+function weekendReward(){let wd=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',weekday:'short'}).format(new Date());return wd==='Sun'}
+function isSaturdayVN(){return new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',weekday:'short'}).format(new Date())==='Sat'}
+function collect(){pop('<h2>🎁 Bộ sưu tập</h2><p class="small">Những món quà nhỏ Mầm đã sưu tầm cùng bạn. Cuối tuần ghé chăm Mầm để đón món quà mới nhé!</p><div class="grid">'+items.map((it,i)=>`<div class="item ${s.rewards.includes(it)?'':'muted'}"><img src="assets/props/${it}.png"><div class="small">${names[i]}</div></div>`).join('')+'</div>')}
+function wardrobe(){pop('<h2>🎀 Tủ phụ kiện</h2><p class="small">Chọn món đã mở khóa để Mầm mang theo.</p><div class="grid">'+items.map((it,i)=>`<button class="item ${s.rewards.includes(it)?'':'muted'} ${s.equipped===it?'selected':''}" ${s.rewards.includes(it)?'':'disabled'} onclick="equip('${it}')"><img src="assets/props/${it}.png"><span class="small">${names[i]}</span></button>`).join('')+'</div><p>Đang chọn: '+(names[items.indexOf(s.equipped)]||'Chưa có')+'</p><button class="action" onclick="unequip()">Tháo phụ kiện</button>')}
+function unequip(){s.equipped=null;save();updateEquipped();wardrobe()}
+function equip(it){if(!s.rewards.includes(it))return;s.equipped=it;save();updateEquipped();wardrobe();say('Món này đáng yêu quá! ♡')}
+signs.forEach(([id,name])=>{let o=document.createElement('option');o.value=id;o.textContent=name;$('zodiac').append(o)});$('zodiac').value=s.sign;$('zodiac').onchange=e=>{clearTimeout(animationTimer);animationTimer=null;s.sign=e.target.value;save();render();say('Mình sẽ đồng hành với bạn!')};
+const petControl=$('petControl');
+let touchStart=null;
+let suppressTap=false;
+petControl.addEventListener('pointerdown',event=>{
+  touchStart=event.isPrimary?{id:event.pointerId,x:event.clientX,y:event.clientY}:null;
+  suppressTap=false;
+});
+petControl.addEventListener('pointercancel',()=>{touchStart=null;});
+petControl.addEventListener('pointerup',event=>{
+  if(touchStart?.id!==event.pointerId)return;
+  const dx=event.clientX-touchStart.x;
+  const dy=event.clientY-touchStart.y;
+  touchStart=null;
+  if(Math.abs(dx)<36||Math.abs(dx)<=Math.abs(dy))return;
+  suppressTap=true;
+  const select=$('zodiac');
+  select.selectedIndex=(select.selectedIndex+(dx<0?1:-1)+signs.length)%signs.length;
+  select.dispatchEvent(new Event('change'));
+  react();
+});
+petControl.onclick=event=>{
+  if(!suppressTap||event.detail===0)react();
+  suppressTap=false;
+};
+$('care').onclick=()=>{if(s.days.includes(vnDate()))return;s.days.push(vnDate());s.days=[...new Set(s.days)];let reward=null;if(weekendReward()&&!s.rewardWeeks.includes(weekKey())){s.rewardWeeks.push(weekKey());let missing=items.filter(i=>!s.rewards.includes(i));if(missing.length){reward=missing[Math.floor(Math.random()*missing.length)];s.rewards.push(reward)}}save();render();play('energy',1300);say('Mình nhận được năng lượng rồi! Cảm ơn bạn ♡');if(reward){let i=items.indexOf(reward);pop(`<h2>🎉 Quà cuối tuần!</h2><img width="130" src="assets/props/${reward}.png"><p>Nhận được: <b>${names[i]}</b></p><button class="action" onclick="equip('${reward}')">Trang bị ngay</button>`)}else if(isSaturdayVN())pop('<h2>🌱 Mầm vui lên rồi!</h2><p>Bạn đã chăm Mầm hôm nay.</p><p>🎁 Quà cuối tuần sẽ mở vào Chủ nhật. Hãy quay lại chăm Mầm vào ngày mai để nhận quà nhé!</p>');else pop('<h2>🌱 Mầm vui lên rồi!</h2><p>Cảm ơn bạn đã dành một chút thời gian cho bản thân.</p><p>Hẹn gặp bạn ngày mai nhé ♡</p>')};
+$('wardrobe').onclick=wardrobe;$('collection').onclick=collect;$('info').onclick=()=>pop(`<h2>📅 Tiến trình</h2><p>Đã chăm Mầm: <b>${s.days.length} ngày</b></p><p>Cấp hiện tại: <b>${level()}</b></p><p>Mầm sẽ lớn dần sau 7, 21 và 45 ngày bạn ghé thăm.</p><p>Mỗi ngày mới bắt đầu từ 00:00 (giờ Việt Nam).</p><p class="small">Tiến trình được lưu trên trình duyệt này và chưa tự đồng bộ giữa các thiết bị.</p>`);
+render();setInterval(render,30000);
+</script></body></html>

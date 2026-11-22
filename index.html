@@ -1,41 +1,45 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover"><title>MINDI · Mầm Vui Mỗi Ngày</title><style>
-*{box-sizing:border-box}body{margin:0;background:#e5d8ec;font-family:system-ui,'Arial',sans-serif;color:#57354d;display:grid;place-items:center;min-height:100dvh}button,select{font:inherit}#game{width:min(100%,450px);height:min(100dvh,900px);min-height:650px;position:relative;overflow:hidden;background-size:100% 100%;background-position:center;border:5px solid #fff1dc;box-shadow:0 12px 40px #674d6555}#top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px}.pill{background:#fff1d8e8;border:2px solid #a96d7a;border-radius:16px;padding:7px 10px;font-size:13px;font-weight:800;box-shadow:0 4px #b47d7366}.pill button{border:0;background:transparent;font-size:15px}#bubble{position:absolute;top:21%;left:7%;right:7%;background:#fff7e5ed;border:3px solid #9e6678;border-radius:22px;padding:12px 14px;text-align:center;font-weight:750;box-shadow:0 5px #8f5d6c44}#equipped{position:absolute;left:55%;top:50%;width:14%;height:8%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 3px 2px #563b4b88)}#character{position:absolute;left:50%;top:46%;width:54%;height:30%;object-fit:contain;transform:translate(-50%,-50%);filter:drop-shadow(0 7px 2px #68494a66);cursor:pointer;image-rendering:auto}#bottom{position:absolute;bottom:12px;left:12px;right:12px;display:grid;gap:10px}#care{border:3px solid #a86b39;border-radius:18px;background:linear-gradient(#ffec79,#ffb63b);box-shadow:0 5px #b56b46;color:#633a38;font-weight:900;font-size:19px;padding:15px}#care:disabled{background:linear-gradient(#d7d0d5,#bcb3bb);box-shadow:0 5px #897a89;color:#65545d}.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.day{background:#fff0dce9;border:2px solid #ad7982;border-radius:12px;text-align:center;padding:8px 1px;font-size:12px;font-weight:800}.day.done{background:#c7ecb0}.day.today{outline:3px solid #ffcd54}.nav{display:flex;justify-content:space-between;gap:5px}.nav button,.action{background:#fff2df;border:2px solid #a97380;border-radius:13px;padding:8px 6px;font-weight:800;color:#603b59;flex:1}#equipped[hidden]{display:none!important} @media(max-height:700px){#game{min-height:0;height:100dvh}#bubble{top:17%;padding:8px}#character{top:42%;height:28%}#bottom{gap:6px}#care{padding:10px;font-size:16px}.day{padding:5px 1px}.nav button{padding:6px 2px;font-size:12px}}dialog{border:4px solid #b57b91;border-radius:20px;background:#fff3e3;color:#603c56;max-width:min(92vw,420px);box-shadow:0 20px 100px #39233599}dialog{max-height:85dvh;overflow:auto}dialog::backdrop{background:#352a4488}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.item{background:#f8e4d5;border:2px solid #bd9da4;border-radius:12px;padding:4px;min-height:70px}.item img{width:100%;display:block}.muted{opacity:.38}.selected{outline:3px solid #f6b63f}.close{float:right;border:0;background:transparent;font-size:22px}.small{font-size:12px}.foot{font-size:11px;opacity:.75;text-align:center}#zodiac{max-width:135px;border:0;background:transparent;color:#57354d;font-weight:900}</style></head><body><main id="game"><div id="top"><div class="pill">🌱 MINDI <select id="zodiac"></select></div><div class="pill" id="level"></div></div><div id="bubble">Một chạm hôm nay, thêm chút năng lượng! ♡</div><img id="equipped" alt="" hidden><img id="character" alt="Mầm đồng hành" title="Chạm để Mầm phản ứng"><div id="bottom"><button id="care">🌱 Chăm Mầm hôm nay ♡</button><div class="week" id="week"></div><div class="nav"><button id="wardrobe">🎀 Tủ đồ</button><button id="collection">🎁 Bộ sưu tập</button><button id="info">📅 Tiến trình</button></div><div class="foot">Một chút chăm sóc mỗi ngày, một chút niềm vui lớn lên ♡</div></div></main><dialog id="modal"><button class="close" onclick="modal.close()">✕</button><div id="modalBody"></div></dialog><script>
-const signs=[['aries','Bạch Dương'],['taurus','Kim Ngưu'],['gemini','Song Tử'],['cancer','Cự Giải'],['leo','Sư Tử'],['virgo','Xử Nữ'],['libra','Thiên Bình'],['scorpio','Bọ Cạp'],['sagittarius','Nhân Mã'],['capricorn','Ma Kết'],['aquarius','Bảo Bình'],['pisces','Song Ngư']];
-const items=['bubble_tea','teddy','snack','mirror','lipstick','headphones','bow','beanie','book','coffee','hotpot','camera','flower','sunglasses','scarf','star_lamp'];
-const names=['Trà sữa','Gấu bông','Snack','Gương','Son','Tai nghe','Nơ','Mũ len','Sách','Cà phê','Lẩu','Máy ảnh','Hoa','Kính','Khăn','Đèn sao'];
-const sayings={morning:['Dậy thôi! Hôm nay mình làm một việc nhỏ trước nha!','Hôm nay không cần hoàn hảo, chỉ cần bắt đầu.'],noon:['Ăn trưa chưa? Nhớ nạp năng lượng đó!','Uống nước rồi mình tiếp tục nha.'],afternoon:['Bạn đã cố gắng nhiều rồi. Nghỉ mắt một chút nhé!','Còn chút nữa thôi, mình cổ vũ nè!'],night:['Hôm nay đủ rồi, nghỉ ngơi thôi!','Mình trông góc bàn, bạn đi ngủ nha.']};
-const key='mindi-mamvui-v1';
-let s;try{s=JSON.parse(localStorage.getItem(key)||'null')}catch(e){s=null}
-if(!s||typeof s!=='object')s={};
-if(!signs.some(x=>x[0]===s.sign))s.sign='aries';
-s.days=Array.isArray(s.days)?[...new Set(s.days.filter(x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)))]:[];
-s.rewards=Array.isArray(s.rewards)?[...new Set(s.rewards.filter(x=>items.includes(x)))]:[];
-if(!items.includes(s.equipped)||!s.rewards.includes(s.equipped))s.equipped=null; const $=id=>document.getElementById(id);
-function vnDate(d=new Date()){let parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);let obj=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));return `${obj.year}-${obj.month}-${obj.day}`}
-function hourVN(){return Number(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',hour:'numeric',hourCycle:'h23'}).format(new Date()))}
-function time(){let h=hourVN();return h>=5&&h<12?'morning':h<14?'noon':h<19?'afternoon':'night'}
-function level(){let n=s.days.length;return n>=45?4:n>=21?3:n>=7?2:1}
-function save(){localStorage.setItem(key,JSON.stringify(s))}
-function img(){return `assets/characters/${s.sign}_lv${level()}.png`}
-let animationTimer=null;
-function play(kind,duration=1000){clearTimeout(animationTimer);$('character').src=`assets/animations/${kind}/${s.sign}_lv${level()}.gif`;animationTimer=setTimeout(()=>{animationTimer=null;$('character').src=`assets/animations/${time()==='night'?'sleepy':'idle'}/${s.sign}_lv${level()}.gif`},duration)}
-function updateEquipped(){let el=$('equipped');el.hidden=!s.equipped;if(s.equipped)el.src=`assets/props/${s.equipped}.png`}
-
-function say(txt){$('bubble').textContent=txt}
-function react(){const a=sayings[time()];say(a[Math.floor(Math.random()*a.length)]);play('tap',900)}
-function render(){let t=time();$('game').style.backgroundImage=`url(assets/backgrounds/${t}.png)`;if(!animationTimer){let url=`assets/animations/${t==='night'?'sleepy':'idle'}/${s.sign}_lv${level()}.gif`;if(!$('character').src.endsWith(url))$('character').src=url;}updateEquipped();$('level').textContent=`${['Mầm mới','Mầm quen','Mầm lớn','Mầm trưởng thành'][level()-1]} · ${s.days.length} ngày bên nhau`;$('care').disabled=s.days.includes(vnDate());$('care').textContent=$('care').disabled?'✓ Đã chăm hôm nay · Hẹn mai nhé':'🌱 Chăm Mầm hôm nay ♡';
-let day=new Date(vnDate()+'T12:00:00Z');let weekday=(day.getUTCDay()+6)%7;let monday=new Date(day);monday.setUTCDate(day.getUTCDate()-weekday);$('week').innerHTML=Array.from({length:7},(_,i)=>{let dt=new Date(monday);dt.setUTCDate(monday.getUTCDate()+i);let ds=dt.toISOString().slice(0,10);return `<div class="day ${s.days.includes(ds)?'done':''} ${ds===vnDate()?'today':''}">${['T2','T3','T4','T5','T6','T7','CN'][i]}<div>${s.days.includes(ds)?'✓':i===6?'🎁':'🌱'}</div></div>`}).join('')}
-function pop(content){$('modalBody').innerHTML=content;if(!$('modal').open)$('modal').showModal()}
-function weekKey(){let dt=new Date(vnDate()+'T12:00:00Z');let n=(dt.getUTCDay()+6)%7;dt.setUTCDate(dt.getUTCDate()-n);return dt.toISOString().slice(0,10)}
-s.rewardWeeks=Array.isArray(s.rewardWeeks)?s.rewardWeeks.filter(x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)):[];
-function weekendReward(){let wd=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',weekday:'short'}).format(new Date());return wd==='Sat'||wd==='Sun'}
-function collect(){pop('<h2>🎁 Bộ sưu tập</h2><p class="small">Những món quà nhỏ Mầm đã sưu tầm cùng bạn. Cuối tuần ghé chăm Mầm để đón món quà mới nhé!</p><div class="grid">'+items.map((it,i)=>`<div class="item ${s.rewards.includes(it)?'':'muted'}"><img src="assets/props/${it}.png"><div class="small">${names[i]}</div></div>`).join('')+'</div>')}
-function wardrobe(){pop('<h2>🎀 Tủ phụ kiện</h2><p class="small">Chọn món đã mở khóa để Mầm mang theo.</p><div class="grid">'+items.map((it,i)=>`<button class="item ${s.rewards.includes(it)?'':'muted'} ${s.equipped===it?'selected':''}" ${s.rewards.includes(it)?'':'disabled'} onclick="equip('${it}')"><img src="assets/props/${it}.png"><span class="small">${names[i]}</span></button>`).join('')+'</div><p>Đang chọn: '+(names[items.indexOf(s.equipped)]||'Chưa có')+'</p><button class="action" onclick="unequip()">Tháo phụ kiện</button>')}
-function unequip(){s.equipped=null;save();updateEquipped();wardrobe()}
-function equip(it){s.equipped=it;save();updateEquipped();wardrobe();say('Món này đáng yêu quá! ♡')}
-signs.forEach(([id,name])=>{let o=document.createElement('option');o.value=id;o.textContent=name;$('zodiac').append(o)});$('zodiac').value=s.sign;$('zodiac').onchange=e=>{s.sign=e.target.value;save();render();say('Mình sẽ đồng hành với bạn!')};
-$('character').onclick=react;
-$('care').onclick=()=>{if(s.days.includes(vnDate()))return;s.days.push(vnDate());s.days=[...new Set(s.days)];let reward=null;if(weekendReward()&&!s.rewardWeeks.includes(weekKey())){s.rewardWeeks.push(weekKey());let missing=items.filter(i=>!s.rewards.includes(i));if(missing.length){reward=missing[Math.floor(Math.random()*missing.length)];s.rewards.push(reward)}}save();render();play('energy',1300);say('Mình nhận được năng lượng rồi! Cảm ơn bạn ♡');if(reward){let i=items.indexOf(reward);pop(`<h2>🎉 Quà cuối tuần!</h2><img width="130" src="assets/props/${reward}.png"><p>Nhận được: <b>${names[i]}</b></p><button class="action" onclick="equip('${reward}')">Trang bị ngay</button>`)}else pop('<h2>🌱 Mầm vui lên rồi!</h2><p>Cảm ơn bạn đã dành một chút thời gian cho bản thân.</p><p>Hẹn gặp bạn ngày mai nhé ♡</p>')};
-$('wardrobe').onclick=wardrobe;$('collection').onclick=collect;$('info').onclick=()=>pop(`<h2>📅 Tiến trình</h2><p>Đã chăm Mầm: <b>${s.days.length} ngày</b></p><p>Cấp hiện tại: <b>${level()}</b></p><p>Mầm sẽ lớn dần sau 7, 21 và 45 ngày bạn ghé thăm.</p><p>Mỗi ngày mới bắt đầu từ 00:00 (giờ Việt Nam).</p><p class="small">Tiến trình được lưu trên trình duyệt này và chưa tự đồng bộ giữa các thiết bị.</p>`);
-render();setInterval(render,30000);
-</script></body></html>
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MINDI · Mầm Vui Mỗi Ngày</title>
+  <link rel="stylesheet" href="assets/ui-v1/popup-v2.css">
+  <link rel="stylesheet" href="assets/ui-v1/motion-system-v3.css">
+  <link rel="stylesheet" href="ui-test.css">
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <main id="game" aria-label="MINDI Mầm Vui · RC1 staging">
+    <header id="top">
+      <label class="pill">🌱 MINDI <select id="zodiac" aria-label="Chọn Mầm theo cung"></select></label>
+      <div class="pill" id="level"></div>
+    </header>
+    <p id="bubble" role="status">Một chạm hôm nay, thêm chút năng lượng! ♡</p>
+    <div id="petStage" data-mindi-motion-stage>
+      <button id="petControl" type="button" aria-label="Chạm để Mầm phản ứng">
+        <img id="character" alt="" draggable="false">
+        <img id="equipped" alt="" draggable="false" hidden>
+      </button>
+    </div>
+    <div id="bottom">
+      <button id="care" type="button">🌱 Chăm Mầm hôm nay ♡</button>
+      <section class="calendar" aria-labelledby="calendar-title">
+        <h2 id="calendar-title">Lịch chăm tuần này</h2>
+        <ol class="week" id="week"></ol>
+      </section>
+      <nav class="nav" aria-label="Hoạt động của Mầm">
+        <button id="wardrobe" type="button"><span aria-hidden="true">🎀</span><span>Tủ đồ</span></button>
+        <button id="collection" type="button"><span aria-hidden="true">🎁</span><span>Bộ sưu tập</span></button>
+        <button id="info" type="button"><span aria-hidden="true">📅</span><span>Tiến trình</span></button>
+      </nav>
+    </div>
+  </main>
+  <dialog id="modal" class="mindi-modal" aria-labelledby="popup-title">
+    <button class="close mindi-close" type="button" aria-label="Đóng">✕</button>
+    <h2 id="popup-title"></h2>
+    <div id="modalBody"></div>
+  </dialog>
+<script type="module" src="game.js"></script>
+</body>
+</html>

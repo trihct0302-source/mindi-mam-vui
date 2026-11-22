@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kết quả QA · MINDI staging</title>
+  <style>
+    :root{font:16px/1.55 system-ui;color:#453451;background:#f5eef8}
+    body{margin:auto;max-width:960px;padding:24px}
+    header,.matrix{background:#fff9ff;border:1px solid #cbb5e2;border-radius:16px;padding:16px}
+    h1{margin-block:8px}a{color:#553c7e}
+    nav{display:flex;flex-wrap:wrap;gap:16px}
+    table{border-collapse:collapse;width:100%}
+    th,td{text-align:left;vertical-align:top;padding:8px;border-bottom:1px solid #e4d8ec}
+    .pass{color:#275531;font-weight:700}
+    .pending{color:#754302;font-weight:700}
+    @media(max-width:520px){body{padding:12px}.matrix{padding:8px}th,td{padding:5px}}
+  </style>
+</head>
+<body>
+  <header>
+    <nav><a href="../">Chơi Mầm Vui</a><a href="gallery.html">Thư viện hình ảnh</a><a href="asset-inventory.json">Danh mục tệp</a></nav>
+    <h1>QA · MINDI Mầm Vui staging</h1>
+    <p>Chrome 157 và WebKit 26.0 đạt 7/7 kích thước mỗi trình duyệt. Phát hành đang chờ UAT.</p>
+  </header>
+  <h2>Ma trận chức năng</h2>
+  <div class="matrix">
+    <table>
+      <thead><tr><th>Hạng mục</th><th>Kết quả</th><th>Bằng chứng hoặc phần còn lại</th></tr></thead>
+      <tbody>
+        <tr><td>Chọn cung</td><td class="pass">PASS</td><td>12 cung sau mỗi mốc tiến hóa. Giữ vật phẩm đã trang bị.</td></tr>
+        <tr><td>Chăm hằng ngày</td><td class="pass">PASS</td><td>Một lượt trong ngày, vẫn khóa sau tải lại.</td></tr>
+        <tr><td>Lịch và quà Chủ nhật</td><td class="pass">PASS</td><td>Thứ Bảy chưa có quà, Chủ nhật mở một món. Đã thử mốc 00:00 giờ Việt Nam.</td></tr>
+        <tr><td>Tiến hóa</td><td class="pass">PASS</td><td>7, 21, 45 ngày. Tiến hóa vào sprite idle của cấp mới.</td></tr>
+        <tr><td>Tủ đồ</td><td class="pass">PASS</td><td>Nhận, trang bị, tải lại, tháo. Ô khóa không chọn được.</td></tr>
+        <tr><td>Bộ sưu tập</td><td class="pass">PASS</td><td>16 món, hiển thị tình trạng sở hữu và trang bị.</td></tr>
+        <tr><td>Tiến trình</td><td class="pass">PASS</td><td>Đọc và ghi định dạng lưu cục bộ hiện có.</td></tr>
+        <tr><td>Bong bóng và nút chăm</td><td class="pass">PASS</td><td>Kiểm tra bố cục và trạng thái trên hai engine.</td></tr>
+        <tr><td>Popup V2</td><td class="pass">PASS</td><td>Hộp thoại dùng khung Popup V2, nội dung từ tiến trình thật. Đóng bằng Escape và trả focus.</td></tr>
+        <tr><td>Motion V3</td><td class="pass">PASS</td><td>Luồng chăm và tiến hóa chạy trong game tích hợp. Bài hồi quy độc lập cũng đạt.</td></tr>
+        <tr><td>Sprite và phụ kiện</td><td class="pending">Một phần</td><td>Đã sửa hai sprite idle Bảo Bình. Còn rà thủ công vị trí phụ kiện và các trạng thái chuyển động theo từng form.</td></tr>
+        <tr><td>Responsive và accessibility</td><td class="pending">Một phần</td><td>Desktop và mobile mô phỏng đạt. Còn iPhone Safari, Android Chrome thật và rà accessibility đầy đủ.</td></tr>
+        <tr><td>Game tích hợp UI Kit</td><td class="pass">PASS</td><td>Trang chơi staging gọi UI Kit, Popup V2 và Motion V3 cùng một luồng.</td></tr>
+        <tr><td>Kiểm thử tự động</td><td class="pass">PASS</td><td>Hai engine, 7 kích thước, 3 mốc tiến hóa, 1 ca đổi ngày trên mỗi engine.</td></tr>
+        <tr><td>UAT, phát hành và rollback</td><td class="pending">Chờ UAT</td><td>Có bản staging cục bộ và quy trình rollback. Chưa có người chơi mới và thiết bị thật nghiệm thu.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

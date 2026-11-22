@@ -1,0 +1,21 @@
+#petStage { position: relative; }
+#modal:not([open]) { display: none; }
+#modal {
+  --mindi-radius: 18px;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  min-height: 0;
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 16px;
+}
+#modal .mindi-close { position: static; float: right; width: 44px; height: 44px; }
+#modal h2 { min-height: 44px; padding-block: 10px; margin-top: 0; }
+#modalBody { clear: both; }
+.rc1-items { list-style: none; padding: 0; margin: 0 0 12px; }
+.rc1-items .mindi-slot { min-width: 0; min-height: 88px; padding: 6px 3px; overflow-wrap: anywhere; }
+.rc1-items .mindi-slot img { width: 36px; height: 36px; max-width: 100%; object-fit: contain; }
+.rc1-items .mindi-slot small { display: block; font-size: 0.66rem; }
+.rc1-items .mindi-slot:disabled { opacity: 0.65; cursor: not-allowed; }
+.rc1-reward { width: min(110px, 100%); image-rendering: pixelated; }

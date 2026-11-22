@@ -1,0 +1,38 @@
+{
+  "name": "MINDI Mam Vui UI Kit V1",
+  "reference": "Cosy UI Kit – Soft Pixel Interface",
+  "style": "Modern Kawaii Soft Pixel",
+  "theme": "Lavender",
+  "format": "SVG",
+  "transparentCanvas": true,
+  "backgroundRemovalUsed": false,
+  "palette": {
+    "deepPlum": "#594668",
+    "royalPurple": "#8064A8",
+    "lavender": "#B99BD4",
+    "softLilac": "#DCC9EB",
+    "dreamCream": "#F4EAF8",
+    "pinkBlossom": "#D99DBE",
+    "goldenGlow": "#F3C978"
+  },
+  "components": [
+    "assets/ui-v1/buttons/primary-normal.svg",
+    "assets/ui-v1/buttons/primary-hover.svg",
+    "assets/ui-v1/buttons/primary-pressed.svg",
+    "assets/ui-v1/buttons/primary-disabled.svg",
+    "assets/ui-v1/buttons/secondary-normal.svg",
+    "assets/ui-v1/buttons/secondary-pressed.svg",
+    "assets/ui-v1/buttons/danger-normal.svg",
+    "assets/ui-v1/panels/panel-9slice.svg",
+    "assets/ui-v1/panels/popup-header.svg",
+    "assets/ui-v1/dialogue/speech-bubble.svg",
+    "assets/ui-v1/progress/track.svg",
+    "assets/ui-v1/progress/fill.svg",
+    "assets/ui-v1/controls/toggle-on.svg",
+    "assets/ui-v1/controls/toggle-off.svg",
+    "assets/ui-v1/controls/checkbox-checked.svg",
+    "assets/ui-v1/controls/checkbox-empty.svg",
+    "assets/ui-v1/icons/sprite.svg",
+    "assets/ui-v1/README.md"
+  ]
+}
