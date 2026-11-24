@@ -18,7 +18,7 @@
     figure{margin:0;text-align:center}
     .sprite{position:relative;aspect-ratio:1;display:grid;place-items:center;background:#eee4f5;border-radius:12px}
     img{display:block;max-width:100%;width:100%;height:100%;object-fit:contain}
-    img.accessory{position:absolute;left:70%;bottom:7%;width:25%;height:34%}
+    img.accessory{position:absolute;left:var(--accessory-x);top:var(--accessory-y);width:var(--accessory-size);height:var(--accessory-size);translate:-50% -50%}
     img.item{width:64px;height:64px;margin:auto;image-rendering:pixelated}
     figcaption{font-size:.875rem;margin-top:8px}
     section{margin-block:24px}
@@ -43,6 +43,9 @@
     <section><h2>16 vật phẩm</h2><div id="props"></div></section>
   </main>
   <script type="module">
+    import { spriteDirectory } from '../assets/ui-v1/staging-sprites.js';
+    import { positionAccessory } from '../assets/ui-v1/accessory-placement.js';
+
     const signs = ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'];
     const signNames = ['Bạch Dương','Kim Ngưu','Song Tử','Cự Giải','Sư Tử','Xử Nữ','Thiên Bình','Bọ Cạp','Nhân Mã','Ma Kết','Bảo Bình','Song Ngư'];
     const props = ['bubble_tea','teddy','snack','mirror','lipstick','headphones','bow','beanie','book','coffee','hotpot','camera','flower','sunglasses','scarf','star_lamp'];
@@ -55,12 +58,14 @@
     function render() {
       const kind = motion.value;
       forms.innerHTML = signs.flatMap((sign,i) => [1,2,3,4].map(level => {
-        const override = sign === 'aquarius' && (level === 1 || (level === 4 && kind === 'idle'));
-        const dir = override ? 'assets/qa-v151' : 'assets';
-        const src = kind === 'portrait' ? `${dir}/characters/${sign}_lv${level}.png` : `${dir}/animations/${kind}/${sign}_lv${level}.gif`;
-        const overlay = accessory.value ? `<img class="accessory" loading="lazy" alt="" src="../assets/props/${accessory.value}.png">` : '';
+        const dir = 'assets/' + spriteDirectory(sign, level, kind);
+        const src = kind === 'portrait' ? `${dir}characters/${sign}_lv${level}.png` : `${dir}animations/${kind}/${sign}_lv${level}.gif`;
+        const overlay = accessory.value ? `<img class="accessory" data-sign="${sign}" data-level="${level}" loading="lazy" alt="" src="../assets/props/${accessory.value}.png">` : '';
         return `<figure><div class="sprite"><img src="../${src}" loading="lazy" alt="">${overlay}</div><figcaption>${signNames[i]} · Cấp ${level}</figcaption></figure>`;
       })).join('');
+      for (const image of forms.querySelectorAll('.accessory')) {
+        positionAccessory(image, image.dataset.sign, image.dataset.level, accessory.value);
+      }
     }
     motion.addEventListener('change',render);
     accessory.addEventListener('change',render);

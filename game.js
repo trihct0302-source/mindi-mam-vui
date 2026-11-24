@@ -1,24 +1,73 @@
-import { StagingMotion } from './assets/ui-v1/staging-sprites.js';
+import { StagingMotion, spriteDirectory } from './assets/ui-v1/staging-sprites.js';
+import { positionAccessory } from './assets/ui-v1/accessory-placement.js';
 
 const signs=[['aries','Bạch Dương'],['taurus','Kim Ngưu'],['gemini','Song Tử'],['cancer','Cự Giải'],['leo','Sư Tử'],['virgo','Xử Nữ'],['libra','Thiên Bình'],['scorpio','Bọ Cạp'],['sagittarius','Nhân Mã'],['capricorn','Ma Kết'],['aquarius','Bảo Bình'],['pisces','Song Ngư']];
 const items=['bubble_tea','teddy','snack','mirror','lipstick','headphones','bow','beanie','book','coffee','hotpot','camera','flower','sunglasses','scarf','star_lamp'];
 const names=['Trà sữa','Gấu bông','Snack','Gương','Son','Tai nghe','Nơ','Mũ len','Sách','Cà phê','Lẩu','Máy ảnh','Hoa','Kính','Khăn','Đèn sao'];
 const sayings={morning:['Dậy thôi! Hôm nay mình làm một việc nhỏ trước nha!','Hôm nay không cần hoàn hảo, chỉ cần bắt đầu.'],noon:['Ăn trưa chưa? Nhớ nạp năng lượng đó!','Uống nước rồi mình tiếp tục nha.'],afternoon:['Bạn đã cố gắng nhiều rồi. Nghỉ mắt một chút nhé!','Còn chút nữa thôi, mình cổ vũ nè!'],night:['Hôm nay đủ rồi, nghỉ ngơi thôi!','Mình trông góc bàn, bạn đi ngủ nha.']};
 const key='mindi-mamvui-v1';
-let s;try{s=JSON.parse(localStorage.getItem(key)||'null')}catch(e){s=null}
-if(!s||typeof s!=='object')s={};
-if(!signs.some(x=>x[0]===s.sign))s.sign='aries';
-s.days=Array.isArray(s.days)?[...new Set(s.days.filter(x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)))]:[];
-s.rewards=Array.isArray(s.rewards)?[...new Set(s.rewards.filter(x=>items.includes(x)))]:[];
-if(!items.includes(s.equipped)||!s.rewards.includes(s.equipped))s.equipped=null; const $=id=>document.getElementById(id);
+const $ = id => document.getElementById(id);
+
+function unique(values, valid) {
+  return Array.isArray(values) ? [...new Set(values.filter(valid))] : [];
+}
+const isoDay = day => typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day);
+
+function readProgress() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(key)); } catch { saved = null; }
+  const state = saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+  state.sign = signs.some(([id]) => id === state.sign) ? state.sign : 'aries';
+  state.days = unique(state.days, isoDay);
+  state.rewards = unique(state.rewards, item => items.includes(item));
+  state.rewardWeeks = unique(state.rewardWeeks, isoDay);
+  state.equipped = state.rewards.includes(state.equipped) ? state.equipped : null;
+  return state;
+}
+
+let s = readProgress();
+
+async function updateProgress(change) {
+  function commit() {
+    const current = readProgress();
+    const result = change(current);
+    if (result === null) {
+      s = current;
+      return null;
+    }
+    localStorage.setItem(key, JSON.stringify(current));
+    s = current;
+    return result;
+  }
+  try {
+    return navigator.locks ? await navigator.locks.request(key, commit) : commit();
+  } catch {
+    say('Chưa lưu được tiến trình. Hãy thử lại sau khi kiểm tra quyền lưu dữ liệu của trình duyệt.');
+    return null;
+  }
+}
+
 function vnDate(d=new Date()){let parts=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);let obj=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));return `${obj.year}-${obj.month}-${obj.day}`}
 function hourVN(){return Number(new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Ho_Chi_Minh',hour:'numeric',hourCycle:'h23'}).format(new Date()))}
 function time(){let h=hourVN();return h<5||h>=19?'night':h<12?'morning':h<14?'noon':'afternoon'}
-function level(){let n=s.days.length;return n>=45?4:n>=21?3:n>=7?2:1}
-function save(){localStorage.setItem(key,JSON.stringify(s))}
+function level(state = s){const n=state.days.length;return n>=45?4:n>=21?3:n>=7?2:1}
 const motion = new StagingMotion({root: $('game'), characterEl: $('character'), assetBase: 'assets'});
 
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+function applyMotionPreference() {
+  actionId++;
+  motion.clear();
+  motion.reduced = reducedMotion.matches;
+  motion.characterEl = reducedMotion.matches ? null : $('character');
+  render();
+}
+reducedMotion.addEventListener('change', applyMotionPreference);
+
 function restingSprite() {
+  if (reducedMotion.matches) {
+    const directory = spriteDirectory(s.sign, level(), 'portrait');
+    return `assets/${directory}characters/${s.sign}_lv${level()}.png`;
+  }
   return motion.asset(time() === 'night' ? 'sleepy' : 'idle', {characterId: s.sign, level: level()});
 }
 
@@ -32,7 +81,15 @@ async function animate(effects) {
   if (id === actionId) render();
 }
 
-function updateEquipped(){let el=$('equipped');el.hidden=!s.equipped;if(s.equipped)el.src=`assets/props/${s.equipped}.png`}
+function updateEquipped() {
+  const image = $('equipped');
+  image.hidden = !s.equipped;
+  if (!s.equipped) return;
+
+  const source = `assets/props/${s.equipped}.png`;
+  if (image.getAttribute('src') !== source) image.src = source;
+  positionAccessory(image, s.sign, level(), s.equipped);
+}
 
 function say(txt){$('bubble').textContent=txt}
 function react(){const a=sayings[time()];say(a[Math.floor(Math.random()*a.length)]);void animate([['character.tap']])}
@@ -41,7 +98,7 @@ function render(){let t=time();$('game').style.backgroundImage=`url(assets/backg
 }
 function renderWeek() {
   const today = vnDate();
-  const monday = new Date(weekKey() + 'T12:00:00Z');
+  const monday = new Date(weekKey(today) + 'T12:00:00Z');
   const labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
   $('week').innerHTML = labels.map((label, index) => {
     const date = new Date(monday);
@@ -79,15 +136,11 @@ function showPopup(title, body, {reward = false, opener = document.activeElement
   }
 }
 
-function weekKey() {
-  const date = new Date(vnDate() + 'T12:00:00Z');
+function weekKey(today = vnDate()) {
+  const date = new Date(today + 'T12:00:00Z');
   date.setUTCDate(date.getUTCDate() - (date.getUTCDay() + 6) % 7);
   return date.toISOString().slice(0, 10);
 }
-s.rewardWeeks = Array.isArray(s.rewardWeeks)
-  ? [...new Set(s.rewardWeeks.filter(day => typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day)))]
-  : [];
-
 function showItems(editable, opener) {
   const cards = items.map((item, index) => {
     const owned = s.rewards.includes(item);
@@ -104,38 +157,71 @@ function showItems(editable, opener) {
     (editable ? `<button class="mindi-btn secondary" data-remove ${s.equipped ? '' : 'disabled'}>Tháo phụ kiện</button>` : ''), {opener});
 }
 
-popupBody.addEventListener('click', event => {
+popupBody.addEventListener('click', async event => {
   const button = event.target.closest('button');
   if (!button) return;
   const item = button.dataset.equip;
-  if (item && s.rewards.includes(item)) {
-    s.equipped = item;
-    save();
+  if (item) {
+    const equipped = await updateProgress(state => {
+      if (!state.rewards.includes(item)) return null;
+      state.equipped = item;
+      return item;
+    });
+    if (!equipped) return;
     updateEquipped();
-    showItems(true);
-    popupBody.querySelector(`[data-equip="${item}"]`).focus();
+    if (dialog.open) {
+      showItems(true);
+      popupBody.querySelector(`[data-equip="${item}"]`).focus();
+    }
     say('Món này đáng yêu quá! ♡');
     void animate([['outfit.change', {outfitEl: $('equipped')}]]);
-  } else if (button.hasAttribute('data-remove') && s.equipped) {
-    const previous = s.equipped;
-    s.equipped = null;
-    save();
+  } else if (button.hasAttribute('data-remove')) {
+    const previous = await updateProgress(state => {
+      const oldItem = state.equipped;
+      state.equipped = null;
+      return oldItem;
+    });
+    if (!previous) return;
     updateEquipped();
-    showItems(true);
-    popupBody.querySelector(`[data-equip="${previous}"]`).focus();
+    if (dialog.open) {
+      showItems(true);
+      popupBody.querySelector(`[data-equip="${previous}"]`).focus();
+    }
   }
 });
 
 for (const [id, name] of signs) $('zodiac').add(new Option(name, id));
 $('zodiac').value = s.sign;
-$('zodiac').addEventListener('change', event => {
+async function selectSign(sign) {
+  const changed = await updateProgress(state => {
+    state.sign = sign;
+    return sign;
+  });
+  if (!changed) {
+    $('zodiac').value = s.sign;
+    return;
+  }
   actionId++;
   motion.clear();
-  s.sign = event.target.value;
-  save();
   render();
   say('Mình sẽ đồng hành với bạn!');
+  return changed;
+}
+$('zodiac').addEventListener('change', event => void selectSign(event.currentTarget.value));
+
+window.addEventListener('storage', event => {
+  if (event.key !== key && event.key !== null) return;
+  const previousSign = s.sign;
+  const previousLevel = level();
+  s = readProgress();
+  $('zodiac').value = s.sign;
+  if (s.sign !== previousSign || level() !== previousLevel) {
+    actionId++;
+    motion.clear();
+  }
+  render();
 });
+
 const petControl=$('petControl');
 let touchStart=null;
 let suppressTap=false;
@@ -153,32 +239,38 @@ petControl.addEventListener('pointerup',event=>{
   suppressTap=true;
   const select=$('zodiac');
   select.selectedIndex=(select.selectedIndex+(dx<0?1:-1)+signs.length)%signs.length;
-  select.dispatchEvent(new Event('change'));
-  react();
+  void selectSign(select.value).then(changed => { if (changed) react(); });
 });
 petControl.onclick=event=>{
   if(!suppressTap||event.detail===0)react();
   suppressTap=false;
 };
-$('care').addEventListener('click', () => {
-  const today = vnDate();
-  if (s.days.includes(today)) return;
+$('care').addEventListener('click', async () => {
+  const result = await updateProgress(state => {
+    const today = vnDate();
+    if (state.days.includes(today)) return null;
 
-  const fromLevel = level();
-  const week = weekKey();
-  s.days.push(today);
-  const toLevel = level();
-  const sunday = new Date(today + 'T12:00:00Z').getUTCDay() === 0;
-  let reward;
-  if (sunday && !s.rewardWeeks.includes(week)) {
-    const available = items.filter(item => !s.rewards.includes(item));
-    if (available.length) {
-      reward = available[Math.floor(Math.random() * available.length)];
-      s.rewards.push(reward);
-      s.rewardWeeks.push(week);
+    const fromLevel = level(state);
+    const week = weekKey(today);
+    state.days.push(today);
+    const toLevel = level(state);
+    const dayOfWeek = new Date(today + 'T12:00:00Z').getUTCDay();
+    let reward;
+    if (dayOfWeek === 0 && !state.rewardWeeks.includes(week)) {
+      const available = items.filter(item => !state.rewards.includes(item));
+      if (available.length) {
+        reward = available[Math.floor(Math.random() * available.length)];
+        state.rewards.push(reward);
+        state.rewardWeeks.push(week);
+      }
     }
+    return {fromLevel, toLevel, dayOfWeek, reward};
+  });
+  if (!result) {
+    render();
+    return;
   }
-  save();
+  const {fromLevel, toLevel, dayOfWeek, reward} = result;
   render();
   say('Mình nhận được năng lượng rồi! Cảm ơn bạn ♡');
 
@@ -191,7 +283,7 @@ $('care').addEventListener('click', () => {
     const label = names[items.indexOf(reward)];
     showPopup('Quà cuối tuần!', `<img class="mindi-reward-art rc1-reward" src="assets/props/${reward}.png" alt=""><p>Nhận được <strong>${label}</strong></p><button class="mindi-btn primary" data-equip="${reward}">Trang bị ngay</button>`, {reward: true, opener: $('care')});
   } else {
-    const copy = new Date(today + 'T12:00:00Z').getUTCDay() === 6
+    const copy = dayOfWeek === 6
       ? 'Hãy quay lại chăm Mầm vào Chủ nhật để nhận quà cuối tuần.'
       : 'Hẹn gặp bạn ngày mai nhé ♡';
     showPopup('Mầm vui lên rồi!', `<p>Bạn đã chăm Mầm hôm nay.</p><p>${copy}</p>`, {opener: $('care')});
@@ -203,5 +295,5 @@ $('info').addEventListener('click', () => {
   showPopup('Tiến trình',
     `<p>Đã chăm Mầm <strong>${s.days.length} ngày</strong></p><p>Cấp hiện tại <strong>${level()}</strong></p><p>Mầm lớn dần sau 7, 21 và 45 ngày chăm.</p><p class="small">Tiến trình được lưu trong trình duyệt này. Ngày mới bắt đầu lúc 00:00 giờ Việt Nam.</p>`, {opener: $('info')});
 });
-render();
+applyMotionPreference();
 setInterval(render, 30000);

@@ -19,3 +19,12 @@
 .rc1-items .mindi-slot small { display: block; font-size: 0.66rem; }
 .rc1-items .mindi-slot:disabled { opacity: 0.65; cursor: not-allowed; }
 .rc1-reward { width: min(110px, 100%); image-rendering: pixelated; }
+
+#game #equipped {
+  left: var(--accessory-x);
+  top: var(--accessory-y);
+  bottom: auto;
+  width: var(--accessory-size);
+  height: var(--accessory-size);
+  translate: -50% -50%;
+}

@@ -1,5 +1,7 @@
 # MINDI Mầm Vui · Bản staging tích hợp
 
+Tài liệu này áp dụng cho commit staging `335ce8e`. Với nhánh hiện tại, xem [hướng dẫn Alpha](ALPHA.md).
+
 Mở thư mục giải nén và chạy `python3 -m http.server 18767 --bind 127.0.0.1`. Trang chơi ở [127.0.0.1:18767](http://127.0.0.1:18767/). Có thể xem [Visual Gallery](staging/gallery.html) và [QA Dashboard](staging/dashboard.html) từ cùng máy chủ. Trình duyệt cần HTTP để tải các mô-đun JavaScript.
 
 ## Điểm thay đổi
