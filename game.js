@@ -1,5 +1,5 @@
 import { StagingMotion, spriteDirectory } from './assets/ui-v1/staging-sprites.js';
-import { positionAccessory } from './assets/ui-v1/accessory-placement.js';
+import { presentSprite } from './assets/ui-v1/accessory-placement.js';
 
 const signs=[['aries','Bạch Dương'],['taurus','Kim Ngưu'],['gemini','Song Tử'],['cancer','Cự Giải'],['leo','Sư Tử'],['virgo','Xử Nữ'],['libra','Thiên Bình'],['scorpio','Bọ Cạp'],['sagittarius','Nhân Mã'],['capricorn','Ma Kết'],['aquarius','Bảo Bình'],['pisces','Song Ngư']];
 const items=['bubble_tea','teddy','snack','mirror','lipstick','headphones','bow','beanie','book','coffee','hotpot','camera','flower','sunglasses','scarf','star_lamp'];
@@ -81,14 +81,23 @@ async function animate(effects) {
   if (id === actionId) render();
 }
 
-function updateEquipped() {
-  const image = $('equipped');
-  image.hidden = !s.equipped;
-  if (!s.equipped) return;
+const character = $('character');
+const equippedImage = $('equipped');
+function updateSpritePresentation() {
+  presentSprite(character, equippedImage, s.equipped);
+}
+new MutationObserver(updateSpritePresentation).observe(character, {
+  attributes: true,
+  attributeFilter: ['src'],
+});
 
-  const source = `assets/props/${s.equipped}.png`;
-  if (image.getAttribute('src') !== source) image.src = source;
-  positionAccessory(image, s.sign, level(), s.equipped);
+function updateEquipped() {
+  equippedImage.hidden = !s.equipped;
+  if (s.equipped) {
+    const source = `assets/props/${s.equipped}.png`;
+    if (equippedImage.getAttribute('src') !== source) equippedImage.src = source;
+  }
+  updateSpritePresentation();
 }
 
 function say(txt){$('bubble').textContent=txt}

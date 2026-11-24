@@ -8,7 +8,9 @@
 <p class="legend">Motion API phát sự kiện <code>mindi:motion</code> để gameplay xử lý riêng.</p></aside></div></main>
 <script type="module">
 import {StagingMotion} from './staging-sprites.js';
+import {presentSprite} from './accessory-placement.js';
 const $=id=>document.getElementById(id);const pet=$('pet');
+new MutationObserver(()=>presentSprite(pet)).observe(pet,{attributes:true,attributeFilter:['src']});
 const motion=new StagingMotion({root:document,characterEl:pet,onEvent:(name,detail)=>{const messages={start:'Đang thực hiện hiệu ứng…',complete:'Hoàn tất hiệu ứng.',blocked:'Mầm đã đạt cấp tối đa.',loading:'Đang tải…',drop:'Đã gắn phụ kiện cho Mầm.',unsupported:'Hiệu ứng này chưa được hỗ trợ.'};$('status').textContent=messages[name]||'Mầm vừa có một tương tác mới.';if(name==='complete'&&detail.name==='character.evolve'){$('level').value=String(detail.context.toLevel);refresh();$('status').textContent='Mầm đã tiến hóa lên cấp '+detail.context.toLevel+'.';}if(name==='complete'&&detail.name==='gesture.drag-drop')motion.play('outfit.change',ctx());syncEvolution();}});
 function ctx(){return {characterId:$('sign').value,level:Number($('level').value),fromLevel:Number($('level').value),toLevel:Math.min(4,Number($('level').value)+1),itemEmoji:'🌼',outfitEl:$('outfit')}}
 function syncEvolution(){const max=Number($('level').value)>=4;const b=$('evolveBtn');b.disabled=max;b.textContent=max?'✓ Đã đạt cấp tối đa':'⬆️ Tiến hóa';}

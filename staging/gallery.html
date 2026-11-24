@@ -44,7 +44,7 @@
   </main>
   <script type="module">
     import { spriteDirectory } from '../assets/ui-v1/staging-sprites.js';
-    import { positionAccessory } from '../assets/ui-v1/accessory-placement.js';
+    import { presentSprite } from '../assets/ui-v1/accessory-placement.js';
 
     const signs = ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'];
     const signNames = ['Bạch Dương','Kim Ngưu','Song Tử','Cự Giải','Sư Tử','Xử Nữ','Thiên Bình','Bọ Cạp','Nhân Mã','Ma Kết','Bảo Bình','Song Ngư'];
@@ -60,11 +60,11 @@
       forms.innerHTML = signs.flatMap((sign,i) => [1,2,3,4].map(level => {
         const dir = 'assets/' + spriteDirectory(sign, level, kind);
         const src = kind === 'portrait' ? `${dir}characters/${sign}_lv${level}.png` : `${dir}animations/${kind}/${sign}_lv${level}.gif`;
-        const overlay = accessory.value ? `<img class="accessory" data-sign="${sign}" data-level="${level}" loading="lazy" alt="" src="../assets/props/${accessory.value}.png">` : '';
+        const overlay = accessory.value ? `<img class="accessory" loading="lazy" alt="" src="../assets/props/${accessory.value}.png">` : '';
         return `<figure><div class="sprite"><img src="../${src}" loading="lazy" alt="">${overlay}</div><figcaption>${signNames[i]} · Cấp ${level}</figcaption></figure>`;
       })).join('');
-      for (const image of forms.querySelectorAll('.accessory')) {
-        positionAccessory(image, image.dataset.sign, image.dataset.level, accessory.value);
+      for (const sprite of forms.querySelectorAll('.sprite')) {
+        presentSprite(sprite.firstElementChild, sprite.querySelector('.accessory'), accessory.value);
       }
     }
     motion.addEventListener('change',render);

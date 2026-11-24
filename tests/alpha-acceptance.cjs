@@ -157,17 +157,23 @@ async function checkGallery(browser, engine) {
     const items = await page.locator('#accessory option').evaluateAll(options=>options.map(o=>o.value).filter(Boolean));
     assert.equal(items.length,16);
     let placements = 0;
-    for (const item of items) {
-      await page.locator('#accessory').selectOption(item);
-      const positions = await page.locator('#forms .accessory').evaluateAll(images=>images.map(image=>[
-        '--accessory-x','--accessory-y','--accessory-size'
-      ].map(property=>parseFloat(image.style.getPropertyValue(property)))));
-      assert.equal(positions.length,48);
-      for (const [x,y,size] of positions) assert([x,y].every(value=>value>=size/2 && value<=100-size/2));
-      placements += positions.length;
+    for (const state of ['portrait','idle','sleepy','tap','energy','cheer']) {
+      await page.locator('#motion').selectOption(state);
+      for (const item of items) {
+        await page.locator('#accessory').selectOption(item);
+        const positions = await page.locator('#forms .accessory').evaluateAll(images=>images.map(image=>[
+          '--accessory-x','--accessory-y','--accessory-size'
+        ].map(property=>parseFloat(image.style.getPropertyValue(property)))));
+        assert.equal(positions.length,48);
+        for (const [x,y,size] of positions) assert([x,y].every(value=>value>=size/2 && value<=100-size/2));
+        placements += positions.length;
+      }
     }
     await page.locator('#motion').selectOption('idle');
     await page.locator('#accessory').selectOption('bow');
+    const sprites = page.locator('#forms .sprite img:not(.accessory)');
+    assert(await sprites.evaluateAll(images=>images.some(image=>image.style.clipPath.startsWith('inset('))));
+    assert(await sprites.evaluateAll(images=>images.some(image=>image.src.includes('qa-v151/animations/idle/leo_lv3.gif'))));
     await page.locator('#forms figure').nth(40).scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(output,engine+'-gallery.png')});
     return {status:'PASS',placements,reducedMotion:'portrait'};

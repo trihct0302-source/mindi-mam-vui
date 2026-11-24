@@ -1,10 +1,10 @@
-import { envelopes } from './accessory-anchors.js';
+import { envelopes, spriteTrims } from './accessory-anchors.js';
 
 const headwear = new Set(['bow', 'beanie', 'headphones']);
 const companions = new Set(['teddy', 'star_lamp']);
 
-export function accessoryAnchor(characterId, level, item) {
-  const [left, top, right, bottom] = envelopes[`${characterId}_lv${level}`];
+export function accessoryAnchor(characterId, level, item, state = 'idle') {
+  const [left, top, right, bottom] = envelopes[`${characterId}_lv${level}`][state];
   const width = right - left;
   const height = bottom - top;
   const center = (left + right) / 2;
@@ -31,9 +31,19 @@ export function accessoryAnchor(characterId, level, item) {
   return [Math.min(100 - half, Math.max(half, x)), Math.min(100 - half, Math.max(half, y)), size];
 }
 
-export function positionAccessory(image, characterId, level, item) {
-  const [x, y, size] = accessoryAnchor(characterId, level, item);
+export function positionAccessory(image, characterId, level, item, state = 'idle') {
+  const [x, y, size] = accessoryAnchor(characterId, level, item, state);
   image.style.setProperty('--accessory-x', `${x}%`);
   image.style.setProperty('--accessory-y', `${y}%`);
   image.style.setProperty('--accessory-size', `${size}%`);
+}
+
+export function presentSprite(image, accessory, item) {
+  const match = image.getAttribute('src')?.match(/(?:animations\/(idle|tap|energy|cheer|sleepy)|characters)\/([a-z]+)_lv([1-4])\.(?:gif|png)$/);
+  if (!match) return;
+  const [, animation, characterId, level] = match;
+  const state = animation || 'portrait';
+  const trim = spriteTrims[`${characterId}_lv${level}/${state}`];
+  image.style.clipPath = trim ? `inset(${trim[0]}% 0 ${trim[1]}% 0)` : '';
+  if (accessory && item) positionAccessory(accessory, characterId, level, item, state);
 }

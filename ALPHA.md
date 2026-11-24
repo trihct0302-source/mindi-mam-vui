@@ -14,11 +14,11 @@ Game sử dụng localStorage với khóa `mindi-mamvui-v1`, theo ngày giờ Vi
 
 ## Tài nguyên
 
-Alpha sửa thêm mảnh hình rời trong các GIF idle Bảo Bình cấp 2/3 và Ma Kết cấp 3/4. Các GIF vá giữ kích thước, số khung, thời lượng và chế độ lặp.
+Alpha sửa mảnh hình rời trong các GIF idle Bảo Bình cấp 2/3, Ma Kết cấp 3/4, Sư Tử cấp 3, Bọ Cạp cấp 3 và Xử Nữ cấp 3. Game và thư viện ẩn thêm các dải thật sự tách khỏi thân ở ảnh tĩnh và idle đã kiểm tra. Các GIF vá giữ kích thước, số khung, thời lượng và chế độ lặp.
 
 ## Giới hạn của Alpha
 
-Các phụ kiện sử dụng vị trí riêng theo 48 form và theo loại vật phẩm. Các vị trí được đo trên GIF idle và chưa được duyệt thủ công theo từng khung GIF chuyển động. Biểu cảm nằm trong các GIF hiện có. Một số form còn có vệt cắt hoặc mảnh rời trong ảnh gốc, như Sư Tử, Thiên Bình và Xử Nữ cấp cao. Cần UAT trên iPhone Safari và Android Chrome thật, cùng duyệt các trường hợp phụ kiện che mặt hoặc nằm lệch tùy form. Alpha giữ luật quà Chủ nhật đã được nghiệm thu trên UI Test.
+Các phụ kiện sử dụng vị trí riêng theo 48 form, sáu trạng thái và loại vật phẩm. Kiểm tra hình học tự động đủ 4.608 tổ hợp. Vị trí ổn định trong mỗi trạng thái, chưa bám theo từng khung GIF. Biểu cảm nằm trong các GIF hiện có. Một số form còn có vệt cắt hoặc mảnh rời trong ảnh gốc, như Thiên Bình cấp 3/4 và Xử Nữ cấp 4. Cần UAT trên iPhone Safari và Android Chrome thật, cùng duyệt các trường hợp phụ kiện che mặt hoặc nằm lệch tùy form. Alpha giữ luật quà Chủ nhật đã được nghiệm thu trên UI Test.
 
 ## Rollback
 
