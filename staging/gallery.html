@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Thư viện hình ảnh · MINDI</title>
+  <link rel="stylesheet" href="../assets/ui-v1/sprite-art.css">
   <style>
     :root{font:16px system-ui;color:#453451;background:#f5eef8}
     body{max-width:1200px;margin:auto;padding:24px}
@@ -19,7 +20,7 @@
     .sprite{position:relative;aspect-ratio:1;display:grid;place-items:center;background:#eee4f5;border-radius:12px}
     img{display:block;max-width:100%;width:100%;height:100%;object-fit:contain}
     img.accessory{position:absolute;left:var(--accessory-x);top:var(--accessory-y);width:var(--accessory-size);height:var(--accessory-size);translate:-50% -50%}
-    img.item{width:64px;height:64px;margin:auto;image-rendering:pixelated}
+    img.item{width:64px;height:64px;margin:auto}
     figcaption{font-size:.875rem;margin-top:8px}
     section{margin-block:24px}
   </style>
@@ -54,14 +55,14 @@
     const accessory = document.querySelector('#accessory');
     const forms = document.querySelector('#forms');
     props.forEach((id,i) => accessory.add(new Option(propNames[i],id)));
-    document.querySelector('#props').innerHTML = props.map((prop,i) => `<figure><img class="item" loading="lazy" alt="" src="../assets/props/${prop}.png"><figcaption>${propNames[i]}</figcaption></figure>`).join('');
+    document.querySelector('#props').innerHTML = props.map((prop,i) => `<figure><img class="item mindi-sprite-art" loading="lazy" alt="" src="../assets/props/${prop}.png"><figcaption>${propNames[i]}</figcaption></figure>`).join('');
     function render() {
       const kind = motion.value;
       forms.innerHTML = signs.flatMap((sign,i) => [1,2,3,4].map(level => {
         const dir = 'assets/' + spriteDirectory(sign, level, kind);
         const src = kind === 'portrait' ? `${dir}characters/${sign}_lv${level}.png` : `${dir}animations/${kind}/${sign}_lv${level}.gif`;
-        const overlay = accessory.value ? `<img class="accessory" loading="lazy" alt="" src="../assets/props/${accessory.value}.png">` : '';
-        return `<figure><div class="sprite"><img src="../${src}" loading="lazy" alt="">${overlay}</div><figcaption>${signNames[i]} · Cấp ${level}</figcaption></figure>`;
+        const overlay = accessory.value ? `<img class="accessory mindi-sprite-art" loading="lazy" alt="" src="../assets/props/${accessory.value}.png">` : '';
+        return `<figure><div class="sprite"><img class="mindi-sprite-art" src="../${src}" loading="lazy" alt="">${overlay}</div><figcaption>${signNames[i]} · Cấp ${level}</figcaption></figure>`;
       })).join('');
       for (const sprite of forms.querySelectorAll('.sprite')) {
         presentSprite(sprite.firstElementChild, sprite.querySelector('.accessory'), accessory.value);

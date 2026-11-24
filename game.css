@@ -18,7 +18,7 @@
 .rc1-items .mindi-slot img { width: 36px; height: 36px; max-width: 100%; object-fit: contain; }
 .rc1-items .mindi-slot small { display: block; font-size: 0.66rem; }
 .rc1-items .mindi-slot:disabled { opacity: 0.65; cursor: not-allowed; }
-.rc1-reward { width: min(110px, 100%); image-rendering: pixelated; }
+.rc1-reward { width: min(110px, 100%); }
 
 #game #equipped {
   left: var(--accessory-x);

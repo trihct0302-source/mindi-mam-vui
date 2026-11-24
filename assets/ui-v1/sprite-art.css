@@ -1,0 +1,5 @@
+.mindi-sprite-art {
+  image-rendering: auto;
+  /* A subpixel filter softens the indexed GIF edge at game scale. */
+  filter: blur(0.45px);
+}

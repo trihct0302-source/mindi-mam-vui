@@ -18,7 +18,7 @@ Alpha sửa mảnh hình rời trong các GIF idle Bảo Bình cấp 2/3, Ma K�
 
 ## Giới hạn của Alpha
 
-Các phụ kiện sử dụng vị trí riêng theo 48 form, sáu trạng thái và loại vật phẩm. Kiểm tra hình học tự động đủ 4.608 tổ hợp. Vị trí ổn định trong mỗi trạng thái, chưa bám theo từng khung GIF. Biểu cảm nằm trong các GIF hiện có. Một số form còn có vệt cắt hoặc mảnh rời trong ảnh gốc, như Thiên Bình cấp 3/4 và Xử Nữ cấp 4. Cần UAT trên iPhone Safari và Android Chrome thật, cùng duyệt các trường hợp phụ kiện che mặt hoặc nằm lệch tùy form. Alpha giữ luật quà Chủ nhật đã được nghiệm thu trên UI Test.
+Các phụ kiện sử dụng vị trí riêng theo 48 form, sáu trạng thái và loại vật phẩm. Kiểm tra hình học tự động đủ 4.608 tổ hợp. Vị trí ổn định trong mỗi trạng thái, chưa bám theo từng khung GIF. Biểu cảm nằm trong các GIF hiện có. Game giảm răng cưa ở kích thước hiển thị bằng bộ lọc nhẹ, giữ nguyên tệp ảnh và khung hình. Một số form còn có vệt cắt hoặc mảnh rời trong ảnh gốc, như Thiên Bình cấp 3/4 và Xử Nữ cấp 4. Người dùng xác nhận UAT đã đạt. Còn rà các trường hợp phụ kiện che mặt hoặc nằm lệch tùy form. Alpha giữ luật quà Chủ nhật đã được nghiệm thu trên UI Test.
 
 ## Rollback
 

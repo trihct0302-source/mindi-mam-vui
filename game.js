@@ -154,7 +154,7 @@ function showItems(editable, opener) {
   const cards = items.map((item, index) => {
     const owned = s.rewards.includes(item);
     const equipped = s.equipped === item;
-    const art = `<img src="assets/props/${item}.png" alt=""><span>${names[index]}</span>`;
+    const art = `<img class="mindi-sprite-art" src="assets/props/${item}.png" alt=""><span>${names[index]}</span>`;
     const status = equipped ? 'Đang trang bị' : owned ? 'Đã sở hữu' : 'Chưa mở khóa';
     return editable
       ? `<button type="button" class="mindi-slot${equipped ? ' selected' : ''}" data-equip="${item}" aria-pressed="${equipped}" ${owned ? '' : 'disabled'}>${art}<small>${status}</small></button>`
@@ -290,7 +290,7 @@ $('care').addEventListener('click', async () => {
 
   if (reward) {
     const label = names[items.indexOf(reward)];
-    showPopup('Quà cuối tuần!', `<img class="mindi-reward-art rc1-reward" src="assets/props/${reward}.png" alt=""><p>Nhận được <strong>${label}</strong></p><button class="mindi-btn primary" data-equip="${reward}">Trang bị ngay</button>`, {reward: true, opener: $('care')});
+    showPopup('Quà cuối tuần!', `<img class="mindi-reward-art rc1-reward mindi-sprite-art" src="assets/props/${reward}.png" alt=""><p>Nhận được <strong>${label}</strong></p><button class="mindi-btn primary" data-equip="${reward}">Trang bị ngay</button>`, {reward: true, opener: $('care')});
   } else {
     const copy = dayOfWeek === 6
       ? 'Hãy quay lại chăm Mầm vào Chủ nhật để nhận quà cuối tuần.'
