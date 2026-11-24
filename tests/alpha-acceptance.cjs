@@ -180,6 +180,47 @@ async function checkGallery(browser, engine) {
   } finally { await context.close(); }
 }
 
+async function immediateEquipOnEvolution(browser) {
+  const {page,context,errors} = await pageFor(browser,390,844,{
+    sign:'aquarius', days:history(6), rewards:[], rewardWeeks:[]
+  },undefined,'no-preference');
+  try {
+    await page.locator('#care').tap();
+    await page.getByRole('button',{name:'Trang bị ngay'}).tap();
+    await page.waitForFunction(key=>Boolean(JSON.parse(localStorage.getItem(key)).equipped),key);
+    assert.equal((await readState(page)).days.length,7);
+    assert.equal((await readState(page)).rewards.length,1);
+    await motionComplete(page,'outfit.change');
+    const events = await page.evaluate(()=>window.motionEvents.filter(([phase])=>phase==='complete').map(([,name])=>name));
+    assert.deepEqual(events,['care.confirm','character.evolve','reward.chest.open','outfit.change']);
+    await page.reload();
+    assert.match(await page.locator('#character').getAttribute('src'),/idle\/aquarius_lv2\.gif$/);
+    assert.equal(await page.locator('#equipped').getAttribute('hidden'),null);
+    assert.deepEqual(errors,[]);
+    return {status:'PASS',events};
+  } finally { await context.close(); }
+}
+
+async function invalidLegacyDates(browser) {
+  const {page,context,errors} = await pageFor(browser,390,844,{
+    days:['2026-11-21','2026-11-21','2026-11-32','2026-13-12','2025-02-29','2024-02-29'],
+    rewards:[],rewardWeeks:['2026-02-30','2026-11-16']
+  });
+  try {
+    await page.locator('#info').tap();
+    assert.match(await page.locator('#modalBody').textContent(),/2 ngày/);
+    await page.locator('.close').tap();
+    await page.locator('#care').tap();
+    await page.locator('dialog[open]').waitFor();
+    const saved = await readState(page);
+    assert.deepEqual(saved.days,['2026-11-21','2024-02-29','2026-11-22']);
+    assert.deepEqual(saved.rewardWeeks,['2026-11-16']);
+    assert.deepEqual(saved.rewards,[]);
+    assert.deepEqual(errors,[]);
+    return {status:'PASS',days:saved.days,rewardWeeks:saved.rewardWeeks};
+  } finally { await context.close(); }
+}
+
 (async () => {
   fs.mkdirSync(output,{recursive:true});
   const engine = process.argv[2] ?? 'chrome';
@@ -191,6 +232,8 @@ async function checkGallery(browser, engine) {
     result.weekend = await weekend(browser);
     result.concurrent = await simultaneousCare(browser);
     result.gallery = await checkGallery(browser,engine);
+    result.immediateEquipOnEvolution = await immediateEquipOnEvolution(browser);
+    result.invalidLegacyDates = await invalidLegacyDates(browser);
   } finally {
     fs.writeFileSync(path.join(output,engine+'.json'),JSON.stringify(result,null,2));
     await browser.close();

@@ -11,7 +11,11 @@ const $ = id => document.getElementById(id);
 function unique(values, valid) {
   return Array.isArray(values) ? [...new Set(values.filter(valid))] : [];
 }
-const isoDay = day => typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day);
+function isoDay(day) {
+  if (typeof day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+  const date = new Date(day + 'T00:00:00Z');
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === day;
+}
 
 function readProgress() {
   let saved;
@@ -72,6 +76,7 @@ function restingSprite() {
 }
 
 let actionId = 0;
+let pendingCareMotion;
 async function animate(effects) {
   const id = ++actionId;
   for (const [name, context] of effects) {
@@ -183,7 +188,12 @@ popupBody.addEventListener('click', async event => {
       popupBody.querySelector(`[data-equip="${item}"]`).focus();
     }
     say('Món này đáng yêu quá! ♡');
-    void animate([['outfit.change', {outfitEl: $('equipped')}]]);
+    const careMotion = pendingCareMotion;
+    const currentAction = actionId;
+    if (careMotion) await careMotion;
+    if (currentAction === actionId && s.equipped === item) {
+      void animate([['outfit.change', {outfitEl: $('equipped')}]]);
+    }
   } else if (button.hasAttribute('data-remove')) {
     const previous = await updateProgress(state => {
       const oldItem = state.equipped;
@@ -286,7 +296,11 @@ $('care').addEventListener('click', async () => {
   const effects = [['care.confirm', {level: fromLevel}]];
   if (toLevel > fromLevel) effects.push(['character.evolve', {fromLevel, toLevel, level: fromLevel}]);
   if (reward) effects.push(['reward.chest.open']);
-  void animate(effects);
+  const careMotion = animate(effects);
+  pendingCareMotion = careMotion;
+  void careMotion.finally(() => {
+    if (pendingCareMotion === careMotion) pendingCareMotion = undefined;
+  });
 
   if (reward) {
     const label = names[items.indexOf(reward)];
