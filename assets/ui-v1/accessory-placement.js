@@ -3,8 +3,8 @@ import { envelopes, spriteTrims } from './accessory-anchors.js';
 const headwear = new Set(['bow', 'beanie', 'headphones']);
 const companions = new Set(['teddy', 'star_lamp']);
 
-export function accessoryAnchor(characterId, level, item, state = 'idle') {
-  const [left, top, right, bottom] = envelopes[`${characterId}_lv${level}`][state];
+export function accessoryAnchor(characterId, level, item, state = 'idle', bounds = envelopes[`${characterId}_lv${level}`][state]) {
+  const [left, top, right, bottom] = bounds;
   const width = right - left;
   const height = bottom - top;
   const center = (left + right) / 2;
@@ -31,19 +31,26 @@ export function accessoryAnchor(characterId, level, item, state = 'idle') {
   return [Math.min(100 - half, Math.max(half, x)), Math.min(100 - half, Math.max(half, y)), size];
 }
 
-export function positionAccessory(image, characterId, level, item, state = 'idle') {
-  const [x, y, size] = accessoryAnchor(characterId, level, item, state);
+export function positionAccessory(image, characterId, level, item, state = 'idle', bounds) {
+  const [x, y, size] = accessoryAnchor(characterId, level, item, state, bounds);
   image.style.setProperty('--accessory-x', `${x}%`);
   image.style.setProperty('--accessory-y', `${y}%`);
   image.style.setProperty('--accessory-size', `${size}%`);
 }
 
-export function presentSprite(image, accessory, item) {
-  const match = image.getAttribute('src')?.match(/(?:animations\/(idle|tap|energy|cheer|sleepy)|characters)\/([a-z]+)_lv([1-4])\.(?:gif|png)$/);
+export function spritePresentation(source) {
+  const match = source?.match(/(?:animations\/(idle|tap|energy|cheer|sleepy)|characters)\/([a-z]+)_lv([1-4])\.(?:gif|png)$/);
   if (!match) return;
   const [, animation, characterId, level] = match;
   const state = animation || 'portrait';
   const trim = spriteTrims[`${characterId}_lv${level}/${state}`];
+  return {state, characterId, level, trim};
+}
+
+export function presentSprite(image, accessory, item) {
+  const presentation = spritePresentation(image.getAttribute('src'));
+  if (!presentation) return;
+  const {state, characterId, level, trim} = presentation;
   image.style.clipPath = trim ? `inset(${trim[0]}% 0 ${trim[1]}% 0)` : '';
   if (accessory && item) positionAccessory(accessory, characterId, level, item, state);
 }

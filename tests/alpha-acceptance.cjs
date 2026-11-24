@@ -12,12 +12,13 @@ const sizes = [[1440,900],[1024,768],[320,568],[360,640],[390,844],[430,932],[84
 function history(length) {
   return Array.from({length}, (_, i) => new Date(Date.UTC(2026,10,21-i)).toISOString().slice(0,10));
 }
-async function pageFor(browser, width, height, data, iso = '2026-11-22T03:00:00Z', reduced = 'reduce') {
+async function pageFor(browser, width, height, data, iso = '2026-11-22T03:00:00Z', reduced = 'reduce', runningClock = false) {
   const mobile = width < 1000;
   const context = await browser.newContext({viewport:{width,height}, hasTouch:mobile,isMobile:mobile,reducedMotion:reduced});
   const page = await context.newPage();
   page.setDefaultTimeout(8000);
-  await page.clock.setFixedTime(new Date(iso));
+  if (runningClock) await page.clock.install({time:new Date(iso)});
+  else await page.clock.setFixedTime(new Date(iso));
   await page.addInitScript(({ key, data }) => {
     if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify(data));
     window.motionEvents = [];
@@ -221,6 +222,135 @@ async function invalidLegacyDates(browser) {
   } finally { await context.close(); }
 }
 
+async function openTabAtMidnight(browser) {
+  const {page,context} = await pageFor(browser,390,844,{
+    days:['2026-11-21'], rewards:[], rewardWeeks:[]
+  },'2026-11-21T16:59:56Z','reduce',true);
+  try {
+    assert(await page.locator('#care').isDisabled());
+    await page.clock.runFor(4500);
+    assert(await page.locator('#care').isEnabled());
+    assert.equal(await page.locator('[aria-current=date] time').getAttribute('datetime'),'2026-11-22');
+    return {status:'PASS'};
+  } finally { await context.close(); }
+}
+
+async function openPanelsAcrossTabs(browser) {
+  const {page,context} = await pageFor(browser,390,844,{
+    days:[], rewards:['flower'], equipped:'flower', rewardWeeks:[]
+  });
+  try {
+    const second = await context.newPage();
+    await second.clock.setFixedTime(new Date('2026-11-22T03:00:00Z'));
+    await second.goto(base);
+    await second.locator('#info').click();
+    await page.locator('#care').tap();
+    await page.locator('dialog[open]').waitFor();
+    await second.getByText('1 ngày',{exact:true}).waitFor();
+    await second.locator('.close').click();
+    await second.locator('#collection').click();
+    await second.getByText('2/16',{exact:true}).waitFor();
+
+    await page.locator('.close').tap();
+    await page.locator('#wardrobe').tap();
+    await second.locator('.close').click();
+    await second.locator('#wardrobe').click();
+    await second.locator('[data-remove]').focus();
+    await page.locator('[data-remove]').tap();
+    await second.waitForFunction(() => document.querySelector('[data-remove]').disabled);
+    assert.equal(await second.locator('[data-equip=flower]').getAttribute('aria-pressed'),'false');
+    assert(await second.locator('.close').evaluate(button => document.activeElement === button));
+    return {status:'PASS'};
+  } finally { await context.close(); }
+}
+
+async function careMotionSurvivesTap(browser) {
+  const {page,context,errors} = await pageFor(browser,390,844,{
+    sign:'aquarius', days:history(6), rewards:[], rewardWeeks:[]
+  },undefined,'no-preference');
+  try {
+    await page.locator('#care').tap();
+    await page.locator('.close').tap();
+    await page.locator('#petControl').tap();
+    await motionComplete(page,'reward.chest.open');
+    const events = await page.evaluate(()=>window.motionEvents.filter(([phase])=>phase==='complete').map(([,name])=>name));
+    assert.deepEqual(events,['care.confirm','character.evolve','reward.chest.open']);
+    assert.deepEqual(errors,[]);
+    return {status:'PASS',events};
+  } finally { await context.close(); }
+}
+
+async function equipmentTracksFrames(browser, engine) {
+  const {page,context,errors} = await pageFor(browser,390,844,{
+    sign:'aquarius', days:[], rewards:['bow'], equipped:'bow'
+  },undefined,'no-preference');
+  try {
+    const canvas = page.locator('#characterCanvas');
+    await canvas.waitFor();
+    const sample = await page.evaluate(() => {
+      const canvas = document.querySelector('#characterCanvas');
+      const prop = document.querySelector('#equipped');
+      const left = prop.style.getPropertyValue('--accessory-x');
+      const top = prop.style.getPropertyValue('--accessory-y');
+      return {frame:canvas.dataset.frame,left,top,image:canvas.toDataURL()};
+    });
+    await page.waitForFunction(before => {
+      const canvas = document.querySelector('#characterCanvas');
+      const prop = document.querySelector('#equipped');
+      return canvas.dataset.frame !== before.frame && canvas.toDataURL() !== before.image &&
+        (prop.style.getPropertyValue('--accessory-x') !== before.left ||
+          prop.style.getPropertyValue('--accessory-y') !== before.top);
+    },sample);
+    assert.equal(await page.locator('#character').evaluate(image=>image.style.visibility),'hidden');
+    await page.locator('#petControl').screenshot({path:path.join(output,engine+'-equipped-frame.png')});
+    await page.emulateMedia({reducedMotion:'reduce'});
+    await canvas.waitFor({state:'hidden'});
+    assert.match(await page.locator('#character').getAttribute('src'),/aquarius_lv1.png$/);
+    assert.deepEqual(errors,[]);
+    return {status:'PASS'};
+  } finally { await context.close(); }
+}
+
+async function completeCollectionJourney(browser) {
+  const {page,context,errors} = await pageFor(browser,390,844,{});
+  try {
+    const care = page.locator('#care');
+    const close = page.locator('.close');
+    const start = Date.UTC(2026,10,22,3);
+    const milestones = [];
+    for (let day=0; day<113; day++) {
+      const date = new Date(start + day*86400000);
+      await page.clock.setFixedTime(date);
+      await page.evaluate(()=>dispatchEvent(new Event('pageshow')));
+      await care.evaluate(button=>button.click());
+      await page.locator('dialog[open]').waitFor();
+      const progress = await readState(page);
+      assert.equal(progress.days.length,day+1);
+      assert.equal(progress.rewards.length,Math.min(16,Math.floor(day/7)+1));
+      assert(await care.isDisabled());
+      if ([7,21,45].includes(day+1)) {
+        const next = milestones.length+2;
+        await page.waitForFunction(level => document.querySelector('#character').getAttribute('src').endsWith('_lv'+level+'.png'),next);
+        milestones.push({days:day+1,level:next});
+      }
+      await close.evaluate(button=>button.click());
+    }
+    const saved = await readState(page);
+    assert.equal(new Set(saved.rewards).size,16);
+    assert.equal(new Set(saved.rewardWeeks).size,16);
+    await page.reload();
+    assert(await care.isDisabled());
+    await page.locator('#collection').tap();
+    await page.getByText('16/16',{exact:true}).waitFor();
+    assert.equal(await page.locator('#modalBody .locked').count(),0);
+    await page.locator('.close').tap();
+    await page.locator('#info').tap();
+    await page.getByText('Mầm đã đạt cấp tối đa.',{exact:true}).waitFor();
+    assert.deepEqual(errors,[]);
+    return {status:'PASS',days:saved.days.length,uniqueRewards:saved.rewards.length,milestones};
+  } finally { await context.close(); }
+}
+
 (async () => {
   fs.mkdirSync(output,{recursive:true});
   const engine = process.argv[2] ?? 'chrome';
@@ -234,6 +364,11 @@ async function invalidLegacyDates(browser) {
     result.gallery = await checkGallery(browser,engine);
     result.immediateEquipOnEvolution = await immediateEquipOnEvolution(browser);
     result.invalidLegacyDates = await invalidLegacyDates(browser);
+    result.midnightOpen = await openTabAtMidnight(browser);
+    result.openPanels = await openPanelsAcrossTabs(browser);
+    result.tapDuringCare = await careMotionSurvivesTap(browser);
+    result.completeJourney = await completeCollectionJourney(browser);
+    result.frameEquipment = await equipmentTracksFrames(browser,engine);
   } finally {
     fs.writeFileSync(path.join(output,engine+'.json'),JSON.stringify(result,null,2));
     await browser.close();

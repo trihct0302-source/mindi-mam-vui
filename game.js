@@ -1,5 +1,6 @@
 import { StagingMotion, spriteDirectory } from './assets/ui-v1/staging-sprites.js';
 import { presentSprite } from './assets/ui-v1/accessory-placement.js';
+import { createEquippedAnimation } from './assets/ui-v1/equipped-animation.js';
 
 const signs=[['aries','Bạch Dương'],['taurus','Kim Ngưu'],['gemini','Song Tử'],['cancer','Cự Giải'],['leo','Sư Tử'],['virgo','Xử Nữ'],['libra','Thiên Bình'],['scorpio','Bọ Cạp'],['sagittarius','Nhân Mã'],['capricorn','Ma Kết'],['aquarius','Bảo Bình'],['pisces','Song Ngư']];
 const items=['bubble_tea','teddy','snack','mirror','lipstick','headphones','bow','beanie','book','coffee','hotpot','camera','flower','sunglasses','scarf','star_lamp'];
@@ -88,8 +89,10 @@ async function animate(effects) {
 
 const character = $('character');
 const equippedImage = $('equipped');
+const animateEquipped = createEquippedAnimation(character, $('characterCanvas'), equippedImage);
 function updateSpritePresentation() {
   presentSprite(character, equippedImage, s.equipped);
+  animateEquipped(s.equipped);
 }
 new MutationObserver(updateSpritePresentation).observe(character, {
   attributes: true,
@@ -106,7 +109,11 @@ function updateEquipped() {
 }
 
 function say(txt){$('bubble').textContent=txt}
-function react(){const a=sayings[time()];say(a[Math.floor(Math.random()*a.length)]);void animate([['character.tap']])}
+function react() {
+  const lines = sayings[time()];
+  say(lines[Math.floor(Math.random() * lines.length)]);
+  if (!pendingCareMotion) void animate([['character.tap']]);
+}
 function render(){let t=time();$('game').style.backgroundImage=`url(assets/backgrounds/${t}.png)`;if(!motion.active){let url=restingSprite();if(!$('character').src.endsWith(url))$('character').src=url;}updateEquipped();$('level').textContent=`${['Mầm mới','Mầm quen','Mầm lớn','Mầm trưởng thành'][level()-1]} · ${s.days.length} ngày bên nhau`;$('care').disabled=s.days.includes(vnDate());$('care').textContent=$('care').disabled?'✓ Đã chăm hôm nay · Hẹn mai nhé':'🌱 Chăm Mầm hôm nay ♡';
   renderWeek();
 }
@@ -132,14 +139,17 @@ function renderWeek() {
 const dialog = $('modal');
 const popupBody = $('modalBody');
 let popupOpener;
+let popupView;
 dialog.querySelector('.close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => {
   dialog.classList.remove('is-entering', 'sparkle-burst');
   (popupOpener?.disabled ? $('petControl') : popupOpener)?.focus();
   popupOpener = null;
+  popupView = null;
 });
 
-function showPopup(title, body, {reward = false, opener = document.activeElement} = {}) {
+function showPopup(title, body, {reward = false, opener = document.activeElement, view} = {}) {
+  popupView = view;
   $('popup-title').textContent = title;
   popupBody.innerHTML = body;
   dialog.classList.toggle('sparkle-burst', reward);
@@ -166,9 +176,27 @@ function showItems(editable, opener) {
       : `<li class="mindi-slot${owned ? '' : ' locked'}">${art}<small>${status}</small></li>`;
   }).join('');
   const tag = editable ? 'div' : 'ul';
+  const summary = editable ? '' : `<p>Đã sưu tập <strong>${s.rewards.length}/${items.length}</strong> vật phẩm.</p>`;
   showPopup(editable ? 'Tủ phụ kiện' : 'Bộ sưu tập',
-    `<${tag} class="grid rc1-items">${cards}</${tag}>` +
-    (editable ? `<button class="mindi-btn secondary" data-remove ${s.equipped ? '' : 'disabled'}>Tháo phụ kiện</button>` : ''), {opener});
+    summary + `<${tag} class="grid rc1-items">${cards}</${tag}>` +
+    (editable ? `<button class="mindi-btn secondary" data-remove ${s.equipped ? '' : 'disabled'}>Tháo phụ kiện</button>` : ''),
+    {opener, view: editable ? 'wardrobe' : 'collection'});
+}
+
+function refreshProgressPopup() {
+  if (!dialog.open) return;
+  if (popupView === 'info') showProgress();
+  if (popupView === 'collection') showItems(false);
+  if (popupView === 'wardrobe') {
+    const focused = document.activeElement;
+    const item = focused.dataset.equip;
+    const removing = focused.hasAttribute('data-remove');
+    showItems(true);
+    if (!popupBody.contains(focused) && (item || removing)) {
+      const button = popupBody.querySelector(item ? `[data-equip="${item}"]` : '[data-remove]');
+      (button && !button.disabled ? button : dialog.querySelector('.close')).focus({preventScroll: true});
+    }
+  }
 }
 
 popupBody.addEventListener('click', async event => {
@@ -232,6 +260,9 @@ window.addEventListener('storage', event => {
   if (event.key !== key && event.key !== null) return;
   const previousSign = s.sign;
   const previousLevel = level();
+  const previousDays = s.days.length;
+  const previousRewards = s.rewards.join();
+  const previousItem = s.equipped;
   s = readProgress();
   $('zodiac').value = s.sign;
   if (s.sign !== previousSign || level() !== previousLevel) {
@@ -239,6 +270,9 @@ window.addEventListener('storage', event => {
     motion.clear();
   }
   render();
+  if (previousDays !== s.days.length || previousRewards !== s.rewards.join() || previousItem !== s.equipped) {
+    refreshProgressPopup();
+  }
 });
 
 const petControl=$('petControl');
@@ -314,9 +348,28 @@ $('care').addEventListener('click', async () => {
 });
 $('wardrobe').addEventListener('click', () => showItems(true, $('wardrobe')));
 $('collection').addEventListener('click', () => showItems(false, $('collection')));
-$('info').addEventListener('click', () => {
+function showProgress(opener) {
+  const currentLevel = level();
+  const nextMilestone = [7, 21, 45][currentLevel - 1];
+  const milestone = nextMilestone
+    ? `Còn ${nextMilestone - s.days.length} ngày chăm để lên cấp ${currentLevel + 1}.`
+    : 'Mầm đã đạt cấp tối đa.';
   showPopup('Tiến trình',
-    `<p>Đã chăm Mầm <strong>${s.days.length} ngày</strong></p><p>Cấp hiện tại <strong>${level()}</strong></p><p>Mầm lớn dần sau 7, 21 và 45 ngày chăm.</p><p class="small">Tiến trình được lưu trong trình duyệt này. Ngày mới bắt đầu lúc 00:00 giờ Việt Nam.</p>`, {opener: $('info')});
+    `<p>Đã chăm Mầm <strong>${s.days.length} ngày</strong></p><p>Cấp hiện tại <strong>${currentLevel}</strong></p><p>${milestone}</p><p class="small">Tiến trình được lưu trong trình duyệt này. Ngày mới bắt đầu lúc 00:00 giờ Việt Nam.</p>`,
+    {opener, view:'info'});
+}
+$('info').addEventListener('click', () => showProgress($('info')));
+
+let clockRefresh;
+function refreshClock() {
+  clearTimeout(clockRefresh);
+  render();
+  // Vietnam midnight and time-of-day changes fall on a minute boundary.
+  clockRefresh = setTimeout(refreshClock, 60000 - Date.now() % 60000);
+}
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshClock();
 });
+window.addEventListener('pageshow', refreshClock);
 applyMotionPreference();
-setInterval(render, 30000);
+refreshClock();

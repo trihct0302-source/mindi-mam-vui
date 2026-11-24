@@ -12,13 +12,17 @@ Game sử dụng localStorage với khóa `mindi-mamvui-v1`, theo ngày giờ Vi
 - Với Node và Playwright, chạy `node tests/alpha-acceptance.cjs chrome` rồi `node tests/alpha-acceptance.cjs webkit` khi máy chủ Alpha đang chạy. Có thể đặt `MINDI_TEST_URL` và `MINDI_TEST_OUTPUT`.
 - Với Pillow, chạy `python3 scripts/visual_asset_audit.py` kiểm kê ảnh gốc và `python3 scripts/measure_accessory_anchors.py` để tái tạo bảng vị trí từ các GIF idle.
 
+## Hành trình kiểm thử đầy đủ
+
+Regression giả lập 113 ngày chăm liên tiếp từ hồ sơ mới. Bộ kiểm tra xác nhận đủ 16 món quà khác nhau, ba lần tiến hóa, cấp tối đa, tải lại và tuần kế tiếp sau khi đủ bộ sưu tập. Có thêm ca đổi ngày khi giữ nguyên tab, đồng bộ các cửa sổ Tủ đồ/Bộ sưu tập/Tiến trình và phụ kiện đi theo khung GIF. Bộ tự động dùng Chrome và WebKit.
+
 ## Tài nguyên
 
 Alpha sửa mảnh hình rời trong các GIF idle Bảo Bình cấp 2/3, Ma Kết cấp 3/4, Sư Tử cấp 3, Bọ Cạp cấp 3 và Xử Nữ cấp 3. Game và thư viện ẩn thêm các dải thật sự tách khỏi thân ở ảnh tĩnh và idle đã kiểm tra. Các GIF vá giữ kích thước, số khung, thời lượng và chế độ lặp.
 
 ## Giới hạn của Alpha
 
-Các phụ kiện sử dụng vị trí riêng theo 48 form, sáu trạng thái và loại vật phẩm. Kiểm tra hình học tự động đủ 4.608 tổ hợp. Vị trí ổn định trong mỗi trạng thái, chưa bám theo từng khung GIF. Biểu cảm nằm trong các GIF hiện có. Game giảm răng cưa ở kích thước hiển thị bằng bộ lọc nhẹ, giữ nguyên tệp ảnh và khung hình. Một số form còn có vệt cắt hoặc mảnh rời trong ảnh gốc, như Thiên Bình cấp 3/4 và Xử Nữ cấp 4. Người dùng xác nhận UAT đã đạt. Còn rà các trường hợp phụ kiện che mặt hoặc nằm lệch tùy form. Alpha giữ luật quà Chủ nhật đã được nghiệm thu trên UI Test.
+Các phụ kiện sử dụng vị trí riêng theo 48 form, sáu trạng thái và loại vật phẩm. Kiểm tra hình học tự động đủ 4.608 tổ hợp. Trong game, ảnh động và vị trí phụ kiện được cập nhật từ cùng khung giải mã khi có vật phẩm đang trang bị. Gallery vẫn dùng vị trí tham chiếu theo trạng thái để tải nhiều nhân vật cùng lúc. Biểu cảm nằm trong các GIF hiện có. Game giảm răng cưa ở kích thước hiển thị bằng bộ lọc nhẹ, giữ nguyên tệp ảnh và khung hình. Một số form còn có vệt cắt hoặc mảnh rời trong ảnh gốc, như Thiên Bình cấp 3/4 và Xử Nữ cấp 4. Người dùng xác nhận UAT đã đạt. Còn duyệt thẩm mỹ theo từng form và phục hồi những nét đã mất trong ảnh gốc. Alpha giữ luật quà Chủ nhật đã được nghiệm thu trên UI Test.
 
 ## Rollback
 
